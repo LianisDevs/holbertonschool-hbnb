@@ -31,32 +31,28 @@ hbnb/
 ├── README.md
 ```
 config.py
-
-
+This will be used for configuring enviornment variables and application settings
 
 requirements.txt
-
-
-
-
+This will list all the python packages needed for the project
 
 run.py
-
+This is the entry point for running the Flask application
 
 # APP
+The app/ directory contains the core application code
 
 ### API
+The api/ subdirectory houses the API endpoint, organised by version
 
 v1
+current version - 16/02/26
 
 __init__.py
-
-
-
-
-
+This tells python to treat these directories as importable packages
 
 ### MODELS
+The models/ subdirectory contains the business logic classes
 
 __init__.py
 
@@ -68,22 +64,25 @@ review.py
 
 user.py
 
-
-
-
-
 ### PERSISTENCE
+The persistence/ subdirectory is where the in-memory repository is implemented. Later version will replace with a database using SQL Alchemy
 
 __init__.py
 
 repository.py
 
-
-
-
-
 ### SERVICES
+The services/ subdirectory is where the facade pattern is implemented. Managing the interaction between layers
 
 __init__.py
 
 facade.py
+
+# INSTALLATION
+---
+
+# AUTHORS
+- Liani Mckeown
+- Lachie King
+- Uliana Deshin
+- Anthonia Ifoeze
