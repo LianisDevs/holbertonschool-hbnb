@@ -80,6 +80,11 @@ facade.py
 
 # INSTALLATION
 ---
+Install the dependencies using:
+```
+pip install -r requirements.txt
+```
+
 
 # AUTHORS
 - Liani Mckeown
