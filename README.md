@@ -1,3 +1,7 @@
+# HBNB
+---
+This Repository contains the files for the HBNB project. HBNB replicates the basic functionalities of the AirBNB application, which allows users to find and book short term rentals. These users can also leave reviews on the locations they stay at.
+'''
 hbnb/
 ├── app/
 │   ├── __init__.py
@@ -25,7 +29,7 @@ hbnb/
 ├── config.py
 ├── requirements.txt
 ├── README.md
-
+'''
 config.py
 
 
