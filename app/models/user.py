@@ -55,7 +55,7 @@ class User(BaseModel):
         @email.setter
         def email(self, value):
             """do more research on email validator"""
-            return self.value
+            self.__email = value
         
         """Get value for admin"""
         @property
@@ -67,4 +67,4 @@ class User(BaseModel):
         def is_admin(self, value):
             if not isinstance(value, bool) or isinstance(value, int):
                 raise TypeError("is_admin must be true or false")
-            return self.value
+            self.__is_admin = value
