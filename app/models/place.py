@@ -50,7 +50,7 @@ class Place(BaseModel):
         """Set price value with validation"""
         if not isinstance(value, (int, float)):
             raise TypeError("The price must be a number")
-        if value <= 0:
+        if value < 0:
             raise ValueError("The price must be a positive value.")
         self.__price = float(value)
 
@@ -90,8 +90,8 @@ class Place(BaseModel):
     @owner.setter
     def owner(self, value):
         """Is this how you would validate user?? help pls"""
-
-        from app.models.user import User
+        # tbc if used here or facade
+        """from app.models.user import User
         if not isinstance(value, User):
-            raise TypeError("Owner must be an existing user.")
+            raise TypeError("Owner must be an existing user.")"""
         self.__owner = value
