@@ -11,6 +11,8 @@ class Place(BaseModel):
         self.latitude = latitude
         self.longitude = longitude
         self.owner = owner
+        self.reviews = []
+        self.amenities = []
 
     @property
     def title(self):
@@ -86,12 +88,16 @@ class Place(BaseModel):
     def owner(self):
         """Get owner value"""
         return self.__owner
-    
+
     @owner.setter
     def owner(self, value):
-        """Is this how you would validate user?? help pls"""
-        # tbc if used here or facade
-        """from app.models.user import User
-        if not isinstance(value, User):
-            raise TypeError("Owner must be an existing user.")"""
+        """Set user as owner """
         self.__owner = value
+
+    def add_review(self, review):
+        """Add a review to the place."""
+        self.reviews.append(review)
+
+    def add_amenity(self, amenity):
+        """Add an amenity to the place."""
+        self.amenities.append(amenity)
