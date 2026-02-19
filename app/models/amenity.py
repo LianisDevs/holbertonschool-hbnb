@@ -1,7 +1,11 @@
-class Amenity(self):
+from base_model import BaseModel
+
+
+class Amenity(BaseModel):
     """Amenity Class Model"""
 
     def __init__(self, name):
+        super().__init__()
         self.name = name
 
     # getter for name
@@ -16,6 +20,4 @@ class Amenity(self):
             raise ValueError("Amenity must have a name")
         if not isinstance(value, str):
             raise TypeError("Amenity must be a string")
-        if not value.isalpha():
-            raise ValueError("Amenity must contain only letters")
         self.__name = value
