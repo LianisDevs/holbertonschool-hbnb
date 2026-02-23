@@ -39,6 +39,3 @@ class TestReviewClass():
         }
         review = self.facade.create_review(self.user.id, 4, review_data)
         assert review == None
-
-    def test_update_review(self):
-
