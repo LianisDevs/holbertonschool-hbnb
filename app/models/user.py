@@ -1,4 +1,4 @@
-from base_model import BaseModel
+from app.models.base_model import BaseModel
 from email_validator import validate_email, EmailNotValidError
 
 class User(BaseModel):
@@ -69,6 +69,8 @@ class User(BaseModel):
     """Set value for admin"""
     @is_admin.setter
     def is_admin(self, value):
-        if not isinstance(value, bool) or isinstance(value, int):
+        if not isinstance(value, bool):
+            print("issue with",value)
+            print(isinstance(value, bool))
             raise TypeError("is_admin must be true or false")
         self.__is_admin = value

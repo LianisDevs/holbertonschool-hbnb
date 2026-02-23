@@ -1,3 +1,4 @@
+from app.models.review import Review
 from app.persistence.repository import InMemoryRepository
 
 class HBnBFacade:
@@ -34,7 +35,17 @@ class HBnBFacade:
         pass
 
     def create_review(self, user_id, place_id, review_data):
-        pass
+        #check if user id is in database
+        user = self.user_repo.get(user_id)
+        if user is None:
+            return None
+        #check if place id is in database
+        place = self.place_repo.get(place_id)
+        if place is None:
+            return None
+        review = Review(review_data["text"], review_data["rating"], place.id, user.id)
+        return review
+
 
     def update_review(self, review_id, review_data):
         pass
