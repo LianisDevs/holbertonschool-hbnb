@@ -39,3 +39,32 @@ class TestReviewClass():
         }
         review = self.facade.create_review(self.user.id, 4, review_data)
         assert review == None
+
+class TestPlaceClass():
+    facade = HBnBFacade()
+    user = User('john', 'smith', 'js@gmail.com', False)
+
+    def test_create_place(self):
+        place_data = {
+            "title": "Fantabulous Cottage in the Woods",
+            "price": 50.00,
+            "latitude": 37.7749,
+            "longitude": -122.4194
+        }
+        self.facade.user_repo.add(self.user)
+        place = self.facade.create_place(self.user.id, place_data)
+        assert isinstance(place, Place)
+        assert place.title == "Fantabulous Cottage in the Woods"
+        assert place.price == 50.00
+        assert place.latitude == 37.7749
+        assert place.longitude == -122.4194
+
+    def test_only_create_place_if_user_is_valid(self):
+        place_data = {
+            "title": "Fantabulous Cottage in the Woods",
+            "price": 50.00,
+            "latitude": 37.7749,
+            "longitude": -122.4194
+        }
+        place = self.facade.create_place(2, place_data)
+        assert place == None

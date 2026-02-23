@@ -1,4 +1,5 @@
 from app.models.review import Review
+from app.models.place import Place
 from app.persistence.repository import InMemoryRepository
 
 class HBnBFacade:
@@ -23,8 +24,14 @@ class HBnBFacade:
         pass
 
     def create_place(self, user_id, place_data):
-        pass
-
+        #check if user id is in database
+        user = self.user_repo.get(user_id)
+        if user is None:
+            return None
+        #create place instance
+        place = Place(place_data["title"], place_data["price"], place_data["latitude"], place_data["longitude"], user.id)
+        return place
+    
     def update_place(self, place_id):
         pass
 
