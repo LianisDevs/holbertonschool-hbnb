@@ -1,5 +1,6 @@
 from app.models.review import Review
 from app.models.place import Place
+from app.models.amenity import Amenity
 from app.persistence.repository import InMemoryRepository
 
 class HBnBFacade:
@@ -64,7 +65,8 @@ class HBnBFacade:
         pass
 
     def create_amenity(self, amenity_data):
-        pass
+        amenity = Amenity(amenity_data["name"])
+        return amenity
 
     def update_amenity(self, amenity_id):
         pass

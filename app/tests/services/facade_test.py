@@ -4,6 +4,7 @@ from app.models.user import User
 from app.models.place import Place
 from app.services.facade import HBnBFacade
 from app.models.review import Review
+from app.models.amenity import Amenity
 
 class TestReviewClass():
     facade = HBnBFacade()
@@ -68,3 +69,14 @@ class TestPlaceClass():
         }
         place = self.facade.create_place(2, place_data)
         assert place == None
+
+class TestAmenity():
+    facade = HBnBFacade()
+
+    def test_create_amenity(self):
+        amenity_data = {
+            "name": "Swimming Pool for the ages"
+        }
+        amenity = self.facade.create_amenity(amenity_data)
+        assert isinstance(amenity, Amenity)
+        assert amenity.name == "Swimming Pool for the ages"
