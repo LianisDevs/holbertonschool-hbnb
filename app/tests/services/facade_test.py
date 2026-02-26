@@ -5,6 +5,8 @@ from app.models.place import Place
 from app.services.facade import HBnBFacade
 from app.models.review import Review
 from app.models.amenity import Amenity
+from app.persistence.repository import InMemoryRepository
+from app.services.facade import HBnBFacade
 
 class TestReviewClass():
     facade = HBnBFacade()
@@ -80,3 +82,57 @@ class TestAmenity():
         amenity = self.facade.create_amenity(amenity_data)
         assert isinstance(amenity, Amenity)
         assert amenity.name == "Swimming Pool for the ages"
+
+    def test_get_amenity(self):
+        # clear the amenity_repo before starting new test
+        self.facade = HBnBFacade()
+        self.facade.amenity_repo = InMemoryRepository()
+
+        amenity_1 = self.facade.create_amenity({"name": "Pool"})
+        amenity_2 = self.facade.create_amenity({"name": "Wi-Fi"})
+        amenity_3 = self.facade.create_amenity({"name": "Air Conditioning"})
+
+        amenity = self.facade.get_amenity(amenity_1.id)
+
+        assert isinstance(amenity, Amenity)
+        assert amenity.name == "Pool"
+
+    def test_get_all_amenities(self):
+        # clear the amenity_repo before starting new test
+        self.facade = HBnBFacade()
+        self.facade.amenity_repo = InMemoryRepository()
+
+        amenity_1 = self.facade.create_amenity({"name": "Pool"})
+        amenity_2 = self.facade.create_amenity({"name": "Wi-Fi"})
+        amenity_3 = self.facade.create_amenity({"name": "Air Conditioning"})
+        amenities = self.facade.get_all_amenities()
+
+        assert isinstance(amenities, list)
+        assert len(amenities) == 3
+        assert any(amenity.name == "Pool" for amenity in amenities)
+
+    def test_update_amenity(self):
+        # clear the amenity_repo before starting new test
+        self.facade = HBnBFacade()
+        self.facade.amenity_repo = InMemoryRepository()
+
+        amenity_1 = self.facade.create_amenity({"name": "Pool"})
+
+        amenity = self.facade.update_amenity(amenity_1.id, {"name": "Swimming Pool"})
+
+        assert isinstance(amenity, Amenity)
+        assert amenity.name == "Swimming Pool"
+
+    def test_delete_amenity(self):
+        # clear the amenity_repo before starting new test
+        self.facade = HBnBFacade()
+        self.facade.amenity_repo = InMemoryRepository()
+
+        amenity_1 = self.facade.create_amenity({"name": "Pool"})
+
+        deleted = self.facade.delete_amenity(amenity_1.id)
+
+        assert deleted is not None
+        assert deleted.name == "Pool"
+
+        assert self.facade.get_amenity(amenity_1.id) is None
