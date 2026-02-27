@@ -41,6 +41,24 @@ class TestReviewClass():
         review = self.facade.create_review(self.user.id, 4, review_data)
         assert review == None
 
+class TestUserClass():
+    facade = HBnBFacade()
+
+    def test_create_user(self):
+        user_data = {
+            "first_name": "John",
+            "last_name": "Smith",
+            "email": "js@gmail.com",
+            "is_admin": False
+        }
+        user = self.facade.create_user(user_data)
+        assert isinstance(user, User)
+        assert user.first_name == "John"
+        assert user.last_name == "Smith"
+        assert user.email  == "js@gmail.com"
+        assert user.is_admin == False
+
+
 class TestPlaceClass():
     facade = HBnBFacade()
     user = User('john', 'smith', 'js@gmail.com', False)
