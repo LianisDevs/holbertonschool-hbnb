@@ -86,10 +86,7 @@ class HBnBFacade:
         pass
 
     def create_amenity(self, amenity_data):
-        """Create a new amenity: TEMPORARY ONLY FOR ULIANA TESTING, PLEASE CHANGE THIS LACHIE"""
-        amenity = Amenity(amenity_data["name"])
-        self.amenity_repo.add(amenity)
-        return amenity
+        pass
 
     def update_amenity(self, amenity_id):
         pass
