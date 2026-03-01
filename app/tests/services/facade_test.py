@@ -6,6 +6,8 @@ from app.services import facade
 from app.services.facade import HBnBFacade
 from app.models.review import Review
 from app.models.amenity import Amenity
+from app.persistence.repository import InMemoryRepository
+from app.services.facade import HBnBFacade
 
 class TestReviewClass():
     facade = HBnBFacade()
@@ -247,6 +249,117 @@ class TestReviewClass():
         self.facade.delete_review(1)
         deleted_review = self.facade.get_review(1)
         assert deleted_review == None
+class TestUserClass():
+    facade = HBnBFacade()
+
+    def test_create_user(self):
+        user_data = {
+            "first_name": "John",
+            "last_name": "Smith",
+            "email": "js@gmail.com",
+            "is_admin": False
+        }
+        user = self.facade.create_user(user_data)
+        assert isinstance(user, User)
+        assert user.first_name == "John"
+        assert user.last_name == "Smith"
+        assert user.email  == "js@gmail.com"
+        assert user.is_admin == False
+    
+    def test_email_already_registered(self):
+        user_data = {
+            "first_name": "John",
+            "last_name": "Smith",
+            "email": "js@gmail.com",
+            "is_admin": False
+        }
+        self.facade.create_user(user_data)
+        existing_user = self.facade.get_user_by_email("js@gmail.com")
+        assert existing_user is not None
+        
+    def test_update_user(self):
+        user_data = {
+            "first_name": "Old",
+            "last_name": "Name",
+            "email": "oldname@gmail.com",
+            "is_admin": False
+        }
+        user = self.facade.create_user(user_data)
+        update_data = {
+            "first_name": "New",
+            "last_name": "Name",
+            "email": "newname@gmail.com",
+            "is_admin": False
+        }
+        updated_user = self.facade.update_user(user.id, update_data)
+        assert updated_user is not None
+        assert updated_user.first_name == "New"
+        assert updated_user.email == "newname@gmail.com"
+        
+    def test_update_user_not_found(self):
+        update_data = {
+            "first_name": "Ghost",
+            "last_name": "User",
+            "email": "ghost@gmail.com",
+            "is_admin": False
+        }
+        result = self.facade.update_user("nonexistent", update_data)
+        assert result is None
+        
+    def test_get_user_by_id_found(self):
+        user_data = {
+            "first_name": "Jane",
+            "last_name": "Doe",
+            "email": "jane@gmail.com",
+            "is_admin": False
+        }
+        user = self.facade.create_user(user_data)
+        found_user = self.facade.get_user(user.id)
+        assert found_user is not None
+        assert found_user.id == user.id
+        assert found_user.first_name == "Jane"
+        assert found_user.email == "jane@gmail.com"
+        
+    def test_get_user_by_id_not_found(self):
+        user = self.facade.get_user("nonexistent-id")
+        assert user is None
+        
+    def test_get_user_by_email_found(self):
+        user_data = {
+            "first_name": "Sam",
+            "last_name": "Adams",
+            "email": "sam@gmail.com",
+            "is_admin": False
+        }
+        self.facade.create_user(user_data)
+        found_user = self.facade.get_user_by_email("sam@gmail.com")
+        assert found_user is not None
+        assert found_user.email == "sam@gmail.com"
+        assert found_user.first_name == "Sam"
+    
+    def test_get_user_by_email_not_found(self):
+        user = self.facade.get_user_by_email("ghost@nowhere.com")
+        assert user is None
+
+    def test_retrieve_list_of_all_users(self):
+        user_data_1 = {
+            "first_name": "Alice",
+            "last_name": "Wonder",
+            "email": "alice@gmail.com",
+            "is_admin": False
+        }
+        user_data_2 = {
+            "first_name": "Bob",
+            "last_name": "Builder",
+            "email": "bob@gmail.com",
+            "is_admin": False
+        }
+        self.facade.create_user(user_data_1)
+        self.facade.create_user(user_data_2)
+        all_users = self.facade.get_all_users()
+        assert isinstance(all_users, list)
+        assert len(all_users) >= 2
+        assert all(isinstance(u, User) for u in all_users)
 
 
 class TestPlaceClass():
@@ -288,3 +401,57 @@ class TestAmenity():
         amenity = self.facade.create_amenity(amenity_data)
         assert isinstance(amenity, Amenity)
         assert amenity.name == "Swimming Pool for the ages"
+
+    def test_get_amenity(self):
+        # clear the amenity_repo before starting new test
+        self.facade = HBnBFacade()
+        self.facade.amenity_repo = InMemoryRepository()
+
+        amenity_1 = self.facade.create_amenity({"name": "Pool"})
+        amenity_2 = self.facade.create_amenity({"name": "Wi-Fi"})
+        amenity_3 = self.facade.create_amenity({"name": "Air Conditioning"})
+
+        amenity = self.facade.get_amenity(amenity_1.id)
+
+        assert isinstance(amenity, Amenity)
+        assert amenity.name == "Pool"
+
+    def test_get_all_amenities(self):
+        # clear the amenity_repo before starting new test
+        self.facade = HBnBFacade()
+        self.facade.amenity_repo = InMemoryRepository()
+
+        amenity_1 = self.facade.create_amenity({"name": "Pool"})
+        amenity_2 = self.facade.create_amenity({"name": "Wi-Fi"})
+        amenity_3 = self.facade.create_amenity({"name": "Air Conditioning"})
+        amenities = self.facade.get_all_amenities()
+
+        assert isinstance(amenities, list)
+        assert len(amenities) == 3
+        assert any(amenity.name == "Pool" for amenity in amenities)
+
+    def test_update_amenity(self):
+        # clear the amenity_repo before starting new test
+        self.facade = HBnBFacade()
+        self.facade.amenity_repo = InMemoryRepository()
+
+        amenity_1 = self.facade.create_amenity({"name": "Pool"})
+
+        amenity = self.facade.update_amenity(amenity_1.id, {"name": "Swimming Pool"})
+
+        assert isinstance(amenity, Amenity)
+        assert amenity.name == "Swimming Pool"
+
+    def test_delete_amenity(self):
+        # clear the amenity_repo before starting new test
+        self.facade = HBnBFacade()
+        self.facade.amenity_repo = InMemoryRepository()
+
+        amenity_1 = self.facade.create_amenity({"name": "Pool"})
+
+        deleted = self.facade.delete_amenity(amenity_1.id)
+
+        assert deleted is not None
+        assert deleted.name == "Pool"
+
+        assert self.facade.get_amenity(amenity_1.id) is None
