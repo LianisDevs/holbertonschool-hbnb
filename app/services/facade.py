@@ -50,23 +50,44 @@ class HBnBFacade:
             return []
         return all_users
 
-    def create_place(self, user_id, place_data):
-        #check if user id is in database
-        user = self.user_repo.get(user_id)
+    def create_place(self, owner_id, place_data):
+        """Create a new place"""
+        # Check if user id is in database
+        user = self.user_repo.get(owner_id)
         if user is None:
             return None
         #create place instance
         place = Place(place_data["title"], place_data["price"], place_data["latitude"], place_data["longitude"], user.id)
+       
+       # Add place to repository
+        self.place_repo.add(place)
+
         return place
     
-    def update_place(self, place_id):
-        pass
+    
+    def update_place(self, place_id, place_data):
+        """Update a place with new data"""
+        place = self.place_repo.get(place_id)
+        if not place:
+            return None
+        self.place_repo.update(place_id, place_data)
+        return self.place_repo.get(place_id)
 
     def delete_place(self, place_id):
-        pass
+        """Delete a place by ID"""
+        place = self.place_repo.get(place_id)
+        if not place:
+            return False
+        self.place_repo.delete(place_id)
+        return True
+
+    def get_all_places(self):
+        """Get all places"""
+        return self.place_repo.get_all()
 
     def get_place(self, place_id):
-        pass
+        """Get a specific place by ID"""
+        return self.place_repo.get(place_id)
 
     def create_review(self, user_id, place_id, review_data):
         #check if user id is in database
@@ -91,8 +112,7 @@ class HBnBFacade:
         pass
 
     def create_amenity(self, amenity_data):
-        amenity = Amenity(amenity_data["name"])
-        return amenity
+        pass
 
     def update_amenity(self, amenity_id):
         pass

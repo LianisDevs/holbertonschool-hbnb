@@ -6,7 +6,7 @@ class Place(BaseModel):
     """Place model"""
     def __init__(self, title, price, latitude, longitude, owner, description=None):
         super().__init__()
-        
+
         self.title = title
         self.description = description  
         self.price = price
@@ -20,7 +20,7 @@ class Place(BaseModel):
     def title(self):
         """Get title value"""
         return self.__title
-    
+
     @title.setter
     def title(self, value):
         """Set title value with validation"""
@@ -36,7 +36,7 @@ class Place(BaseModel):
     def description(self):
         """Get description value"""
         return self.__description
-    
+
     @description.setter 
     def description(self, value):
         """Set description value with validation"""
@@ -48,7 +48,7 @@ class Place(BaseModel):
     def price(self):
         """Get price value"""
         return self.__price
-    
+
     @price.setter
     def price(self, value):
         """Set price value with validation"""
@@ -62,7 +62,7 @@ class Place(BaseModel):
     def latitude(self):
         """Get latitude value"""
         return self.__latitude
-    
+
     @latitude.setter
     def latitude(self, value):
         """Set latitude value with validation"""
@@ -76,7 +76,7 @@ class Place(BaseModel):
     def longitude(self):
         """Get longitude value"""
         return self.__longitude
-    
+
     @longitude.setter
     def longitude(self, value):
         """Set longitude value with validation"""
