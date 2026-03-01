@@ -1,6 +1,7 @@
 from app.models.review import Review
 from app.models.place import Place
 from app.models.amenity import Amenity
+from app.models.user import User
 from app.persistence.repository import InMemoryRepository
 
 class HBnBFacade:
@@ -11,18 +12,43 @@ class HBnBFacade:
         self.amenity_repo = InMemoryRepository()
 
     # Placeholder method for creating a user
-    def register_user(self, user_data):
-        # Logic will be implemented in later tasks
-        pass
+    def create_user(self, user_data):
+        #register user
+        user = User(user_data['first_name'], user_data['last_name'], user_data['email'], user_data['is_admin'])
+        self.user_repo.add(user)
+        return user
 
     def delete_user(self, user_id):
         pass
 
-    def update_user(self, user_id):
-        pass
+    def update_user(self, user_id, user_data):
+        user = self.user_repo.get(user_id)
+        if user is None:
+            return None
+        
+        user.first_name = user_data.get("first_name", user.first_name)
+        user.last_name = user_data.get("last_name", user.last_name)
+        user.email = user_data.get("email", user.email)
+        user.is_admin = user_data.get("is_admin", user.is_admin)
+        return user
 
     def get_user(self, user_id):
-        pass
+        user = self.user_repo.get(user_id)
+        if user is None:
+            return None
+        return user
+
+    def get_user_by_email(self, email):
+        user_email = self.user_repo.get_by_attribute('email', email)
+        if user_email is None:
+            return None
+        return user_email
+
+    def get_all_users(self):
+        all_users = self.user_repo.get_all()
+        if all_users is None:
+            return []
+        return all_users
 
     def create_place(self, owner_id, place_data):
         """Create a new place"""
