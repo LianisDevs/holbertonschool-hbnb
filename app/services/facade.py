@@ -112,13 +112,32 @@ class HBnBFacade:
         pass
 
     def create_amenity(self, amenity_data):
-        pass
+        amenity = Amenity(amenity_data["name"])
+        # add amenity to local storage
+        self.amenity_repo.add(amenity)
+        return amenity
 
-    def update_amenity(self, amenity_id):
-        pass
+    def get_amenity(self, amenity_id):
+        return self.amenity_repo.get(amenity_id)
+
+    def get_all_amenities(self):
+        return self.amenity_repo.get_all()
+
+    def update_amenity(self, amenity_id, amenity_data):
+        amenity = self.get_amenity(amenity_id)
+        if not amenity:
+            return None
+
+        for key, value in amenity_data.items():
+            setattr(amenity, key, value)
+        
+        return amenity        
 
     def delete_amenity(self, amenity_id):
-        pass
+        amenity = self.get_amenity(amenity_id)
+        if not amenity:
+            return None
 
-    def list_amenity(self, amenity_id):
-        pass
+        self.amenity_repo.delete(amenity_id)
+
+        return amenity
