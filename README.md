@@ -124,16 +124,209 @@ It is important that you change the <AMENITY_ID> field as this is how you specif
 
 ### USER CREATION
 
-Once you have implemented the necessary validation, you should perform tests using cURL. Below are some examples of how to test different scenarios:
+Once necessary validation has been implemented, tests can be performed using cURL. Below are some examples of different test scenarios:
 
 #### Testing the Creation of a User
 ```bash
-curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{
-    "first_name": "Susan",
-    "last_name": "Homage",
-    "email": "susan.homage@example.com",
+curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "John",
+    "last_name": "Smith",
+    "email": "john.smith@example.com",
     "is_admin": false
-}'
+  }'
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "id": "b0fc1e80-e91d-43d0-bb4d-c686952adeff",
+    "first_name": "John",
+    "last_name": "Smith",
+    "email": "john.smith@example.com",
+    "is_admin": false
+}
+
+// 201 Created
+```
+#### Testing Email Already Registered
+First create a user, then attempt to register again with the same email.
+
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "John",
+    "last_name": "Smith",
+    "email": "john.smith@example.com",
+    "is_admin": false
+  }'
+```
+**Expected Response**
+```jsonc
+{
+    "error": "Email already registered"
+}
+
+// 400 Bad Request
+```
+#### Testing Invalid Input Data — Missing Required Field
+Omitting *first_name* from the request body.
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "last_name": "Smith",
+    "email": "john.smith@example.com",
+    "is_admin": false
+  }'
+```
+**Expected Response**
+```jsonc
+{
+    "errors": {
+        "first_name": "'first_name' is a required property"
+    },
+    "message": "Input payload validation failed"
+}
+
+// 400 Bad Request
+```
+#### Testing Invalid Input Data — Bad Email Format
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "John",
+    "last_name": "Smith",
+    "email": "not-a-valid-email",
+    "is_admin": false
+  }'
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "error": "User email must be a valid email"
+}
+
+// 400 Bad Request
+```
+
+### RETRIEVE USERS
+
+#### Testing Retrieval of All Users
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/users/"
+```
+**Expected Response**
+```jsonc
+[
+    {
+        "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
+        "first_name": "John",
+        "last_name": "Smith",
+        "email": "john.smith@example.com",
+        "is_admin": false
+    },
+    {
+        "id": "11c914d0-d55b-58e2-c1g3-990639b7b127",
+        "first_name": "Alice",
+        "last_name": "Wonder",
+        "email": "alice.wonder@example.com",
+        "is_admin": false
+    }
+]
+
+// 200 OK
+```
+### SEARCH USER BY ID
+
+#### Testing Get User by ID — Found
+Replace <user_id> with a valid user ID returned from a previous creation request.
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6f016"
+```
+**Expected Response**
+
+```jsonc
+{
+    "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
+    "first_name": "John",
+    "last_name": "Smith",
+    "email": "john.smith@example.com",
+    "is_admin": false
+}
+
+// 200 OK
+```
+#### Testing Get User by ID — Not Found
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/users/nonexistent-id-999"
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "error": "User not found"
+}
+
+// 404 Not Found
+```
+
+#### SEARCH USER BY EMAIL
+Testing Get User by Email — Found
+
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/users/email/john.smith@example.com"
+```
+**Expected Response**
+
+```jsonc
+{
+    "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
+    "first_name": "John",
+    "last_name": "Smith",
+    "email": "john.smith@example.com",
+    "is_admin": false
+}
+
+// 200 OK
+```
+
+#### SEARCH USER BY EMAIL
+Testing Get User by Email — Not Found
+
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/users/email/john.smithle.com"
+```
+**Expected Response**
+
+```jsonc
+{
+    "error": "User not found"
+}
+
+// 404 Not Found
+```
+
+### UPDATE USER
+#### Testing Update a User — Success
+
+Replace <user_id> with a valid user ID returned from a previous creation request.
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6f016" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "Jonathan",
+    "last_name": "Smith",
+    "email": "jonathan.smith@example.com",
+    "is_admin": false
+  }'
 ```
 
 **Expected Response**
@@ -141,9 +334,56 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application
 ```jsonc
 {
     "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
-    "first_name": "Susan",
-    "last_name": "Homage",
-    "email": "susan.homage@example.com",
+    "first_name": "Jonathan",
+    "last_name": "Smith",
+    "email": "jonathan.smith@example.com",
+    "is_admin": false
+}
+
+// 200 OK
+```
+
+#### Testing Update a User — User Not Found
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/nonexistent-id-999" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "Ghost",
+    "last_name": "User",
+    "email": "ghost@example.com",
+    "is_admin": false
+  }'
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "error": "User not found"
+}
+
+// 404 Not Found
+```
+
+#### Testing Update a User — Partial Update
+Only fields provided in the body will be updated. Fields omitted keep their existing values.
+
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6f016" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "Johnny"
+  }'
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
+    "first_name": "Johnny",
+    "last_name": "Smith",
+    "email": "john.smith@example.com",
     "is_admin": false
 }
 
