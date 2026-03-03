@@ -95,7 +95,23 @@ To Create an amenity, and keeping it clear using the JSON format. Use the below 
 curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
      -H "Content-Type: application/json" \
      -d '{"name":"Your Amenity Name Here"}'
+```
+```
+curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Your Second Amenity Name Here"}'
 
+```
+**Expected Output**
+```
+{
+  "id": 1,
+  "name": "Your Amenity Name Here"
+}
+{
+  "id": 2,
+  "name": "Your Second Amenity Name Here"
+}
 ```
 
 #### GET ALL AMENITIES
@@ -104,26 +120,53 @@ To get a list of all the current Amenities, you can just use the simple curl com
 ```
 curl http://127.0.0.1:5000/api/v1/amenities/
 ```
+**Expected Output**
+```
+[
+  {
+    "id": 1,
+    "name": "Your Amenity Name Here"
+  },
+  {
+    "id": 2,
+    "name": "Your Second Amenity Name Here"
+  }
+]
+```
 
 #### GET AMENITY BY ID
 
 To list an amenity based on it's ID, use the following curl command.
 ```
-curl http://127.0.0.1:5000/api/v1/amenities/<AMENITY_ID>
+curl http://127.0.0.1:5000/api/v1/amenities/<1>
+```
+**Expected Output**
+```
+{
+   "id": 1,
+   "name": "Your Amenity Name Here"
+ },
 ```
 
 #### CHANGE THE NAME OF AN AMENITY, USING ID
 
 To change the details of an amenity (name), use the following command.
 ```
-curl -X PUT http://127.0.0.1:5000/api/v1/amenities/<AMENITY_ID> \
+curl -X PUT http://127.0.0.1:5000/api/v1/amenities/1 \
 -H "Content-Type: application/json" \
 -d '{"name": "Updated Name"}'
 ```
-It is important that you change the <AMENITY_ID> field as this is how you specify which amenity is being changed
+**Expected Output**
+```
+{
+  "id": 1,
+  "name": "Updated Name"
+}
+```
+It is important that you change the "1" ID as this is how you specify which amenity is being changed
 
 # AUTHORS
-- Liani Mckeown
-- Lachie King
-- Uliana Deshin
-- Anthonia Ifoeze
+- **Liani Mckeown**
+- **Lachie King**
+- **Uliana Deshin**
+- **Anthonia Ifoeze**
