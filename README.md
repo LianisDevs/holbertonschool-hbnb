@@ -243,6 +243,17 @@ curl -X GET "http://127.0.0.1:5000/api/v1/users/"
 
 // 200 OK
 ```
+#### Testing Retrieval of All Users — Empty List
+When no users have been created yet.
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/users/"
+```
+**Expected Response**
+```jsonc
+[]
+
+// 200 OK
+```
 ### SEARCH USER BY ID
 
 #### Testing Get User by ID — Found
