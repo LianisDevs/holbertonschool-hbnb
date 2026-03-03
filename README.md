@@ -72,7 +72,7 @@ __init__.py
 repository.py
 
 ### SERVICES
-The services/ subdirectory is where the facade pattern is implemented. Managing the interaction between layers
+The services/ subdirectory is where the facade pattern is implemented. Managing the interaction between layers 
 
 __init__.py
 
@@ -84,7 +84,43 @@ Install the dependencies using:
 ```
 pip install -r requirements.txt
 ```
+# INSTRUCTIONS
+ 
+### AMENITY MANAGEMENT
 
+#### CREATE AMENITY
+
+To Create an amenity, and keeping it clear using the JSON format. Use the below example, while filling the "name" field, with your desired Amenity name.
+```
+curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Your Amenity Name Here"}'
+
+```
+
+#### GET ALL AMENITIES
+
+To get a list of all the current Amenities, you can just use the simple curl command below
+```
+curl http://127.0.0.1:5000/api/v1/amenities/
+```
+
+#### GET AMENITY BY ID
+
+To list an amenity based on it's ID, use the following curl command.
+```
+curl http://127.0.0.1:5000/api/v1/amenities/<AMENITY_ID>
+```
+
+#### CHANGE THE NAME OF AN AMENITY, USING ID
+
+To change the details of an amenity (name), use the following command.
+```
+curl -X PUT http://127.0.0.1:5000/api/v1/amenities/<AMENITY_ID> \
+-H "Content-Type: application/json" \
+-d '{"name": "Updated Name"}'
+```
+It is important that you change the <AMENITY_ID> field as this is how you specify which amenity is being changed
 
 # AUTHORS
 - Liani Mckeown
