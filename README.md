@@ -122,6 +122,37 @@ curl -X PUT http://127.0.0.1:5000/api/v1/amenities/<AMENITY_ID> \
 ```
 It is important that you change the <AMENITY_ID> field as this is how you specify which amenity is being changed
 
+
+
+
+### USER CREATION
+
+#### CREATE USER
+
+Once you have implemented the necessary validation, you should perform tests using cURL. Below are some examples of how to test different scenarios:
+
+Testing the Creation of a User
+```
+curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{
+    "first_name": "Susan",
+    "last_name": "Homage",
+    "email": "susan.homage@example.com",
+    "is_admin": false
+}'
+```
+
+Expected Response
+
+```
+{
+    "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
+    "first_name": "Susan",
+    "last_name": "Homage",
+    "email": "susan.homage@example.com",
+    "is_admin": false
+}
+```
+
 # AUTHORS
 - Liani Mckeown
 - Lachie King
