@@ -31,7 +31,14 @@ class HBnBFacade:
         if user is None:
             return None
         #create place instance
-        place = Place(place_data["title"], place_data["price"], place_data["latitude"], place_data["longitude"], user.id)
+        place = Place(
+            place_data["title"], 
+            place_data["price"], 
+            place_data["latitude"], 
+            place_data["longitude"], 
+            user.id, 
+            place_data.get("description")
+        )
        
        # Add place to repository
         self.place_repo.add(place)
