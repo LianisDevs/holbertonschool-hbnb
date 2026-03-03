@@ -85,7 +85,58 @@ Install the dependencies using:
 pip install -r requirements.txt
 ```
 # INSTRUCTIONS
- 
+### PLACE MANAGEMENT
+
+#### CREATE PLACE
+To create a Place using the JSON format, you can use the below example. Fill in the required fields within acceptable ranges. 
+
+Requirements: 
+- Title must be a string equal to or below 100 chars
+- Description is optional, and must be a string if added
+- Price must be a positive integer
+- Latitude must be between 90 and -90
+- Longitude must be between 180 and -180
+- Owner_id must be pre-existing and valid (this can be achieved by creating a user beforehand and copying its provided UUID)
+- Any amenities added must be valid (achieve this by completing the 'Create Amenity' instructions below).
+
+Use the curl command below:
+```bash
+curl -X POST http://127.0.0.1:5000/api/v1/places/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Fantabulous Cottage in the Woods",
+    "description": "A super cute cottage where you can live out your fairytale dreams!",	
+    "price": 250.00,
+    "latitude": 36.7489,
+    "longitude": -119.7722,
+    "owner_id": "YOUR_ACTUAL_USER_ID_HERE",
+    "amenities": ["YOUR_ACTUAL_WIFI_ID_HERE", "YOUR_ACTUAL_POOL_ID_HERE"]
+  }'
+  ```
+#### GET ALL PLACES
+Get all places as a list with this curl command: 
+```bash
+curl -X GET http://127.0.0.1:5000/api/v1/places/
+```
+
+#### GET PLACE BY ID
+Get a specific place with an id with this curl command (replace cottage789 with a valid place_id):
+```bash
+curl -X GET http://127.0.0.1:5000/api/v1/places/cottage789
+```
+
+#### UPDATE PLACE
+Update an existing place with the fields that require change.
+```bash
+curl -X PUT http://127.0.0.1:5000/api/v1/places/cottage789 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Beach House",
+    "description": "Newly renovated oceanfront property",
+    "price": 300.00
+  }'
+```
+
 ### AMENITY MANAGEMENT
 
 #### CREATE AMENITY
