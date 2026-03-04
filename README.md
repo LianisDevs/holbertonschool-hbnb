@@ -10,6 +10,7 @@ This Repository contains the files for the HBNB project. HBNB replicates the bas
 	- [Place](#place)
 	- [Review](#review)
 	- [Ammenity](#ammenity)
+- [Tests](#tests)
 - [Files](#files)
 - [Authors](#authors)
 
@@ -465,7 +466,11 @@ To create a review you need a valid user_id and place_id, make sure you replace 
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/reviews/ \
      -H "Content-Type: application/json" \
-     -d '{"text": "Dream stay, can't wait to go back!", "rating": 5, "user_id": <add user_id>, "place_id": <add place_id>}'
+     -d '{
+		"text": "Dream stay, can't wait to go back!",
+		"rating": 5, "user_id": <add user_id>,
+		"place_id": <add place_id>
+		}'
 ```
 Expected response valid data:
 ```jsonc
@@ -536,6 +541,33 @@ Expected response invalid review_id:
 
 // 404 Not found
 ```
+#### GET REVIEWS BY PLACE ID
+To get all the reviews for a place you need a valid place_id, make sure you replace the place_id in the curl command:
+```bash
+curl -X GET http://127.0.0.1:5000/api/v1/places/<place_id>/reviews
+```
+Expected response valid data:
+```jsonc
+[
+  {
+    "id": "<review_id>",
+    "text": "Great place to stay!",
+    "rating": 5
+  },
+  ...
+]
+
+// 200 OK
+```
+Expected response invalid place_id:
+```jsonc
+{
+  "error": "Place not found"
+}
+
+// 404 Not found
+```
+
 #### GET ALL REVIEWS
 To get all reviews:
 ```bash
@@ -657,6 +689,15 @@ curl -X PUT http://127.0.0.1:5000/api/v1/amenities/1 \
 ```
 It is important that you change the "1" ID as this is how you specify which amenity is being changed
 
+# Tests
+This application has been tested using pytest. To run the tests created:
+```bash
+> cd holberton-hbnb
+> pip install pytest
+> python3 -m pytest
+```
+This will create a test session and run all the tests. As of 04/03/2026 there is 58 tests for expected outcomes and errors. 
+
 # Files
 ```
 hbnb/
@@ -702,10 +743,10 @@ hbnb/
 ```
 
 
-### APP
+#### APP
 * The app/ directory contains the core application code
 
-### API
+#### API
 * The api/ subdirectory houses the API endpoint, organised by version
 
 * v1
@@ -717,7 +758,7 @@ hbnb/
 * __init__.py
     * This tells python to treat these directories as importable packages
 
-### MODELS
+#### MODELS
 * The models/ subdirectory contains the business logic classes
     * __init__.py
     * amenity.py
@@ -725,20 +766,20 @@ hbnb/
     * review.py
     * user.py
 
-### PERSISTENCE
+#### PERSISTENCE
 * The persistence/ subdirectory is where the in-memory repository is implemented. Later version will replace with a database using SQL Alchemy
     * __init__.py
     * repository.py
 
-### SERVICES
+#### SERVICES
 * The services/ subdirectory is where the facade pattern is implemented. Managing the interaction between layers
     * __init__.py
     * facade.py
 
-### TESTS
+#### TESTS
 * The tests/ subdirectory contains the pytest tests for this project
 
-### UTILS
+#### UTILS
 * The utils/ subdirectory houses the custom errors
     * __init__.py
     * errors/
