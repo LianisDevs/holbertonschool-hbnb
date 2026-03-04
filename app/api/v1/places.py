@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
+from app.models import place
 from app.services import facade
 
 api = Namespace('places', description='Place operations')
@@ -231,3 +232,17 @@ class PlaceResource(Resource):
             return {'error': str(e)}, 400
         except Exception:
             return {'error': 'Internal server error'}, 500
+
+
+@api.route('/<place_id>/reviews')
+class PlaceResource(Resource):
+    @api.response(200, 'Review details retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        place = facade.place_repo.get(place_id)
+        if not place:
+            return {'error': 'Place not found'}, 404
+
+        reviews = facade.get_reviews_by_place(place_id)
+        data = [review.to_json_id_text_rating() for review in reviews]
+        return data, 200
