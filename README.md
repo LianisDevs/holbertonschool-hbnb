@@ -113,18 +113,83 @@ curl -X POST http://127.0.0.1:5000/api/v1/places/ \
     "amenities": ["YOUR_ACTUAL_WIFI_ID_HERE", "YOUR_ACTUAL_POOL_ID_HERE"]
   }'
   ```
+  **Expected Response**
+  ```json
+{
+  "id": "cottage789",
+  "title": "Fantabulous Cottage in the Woods",
+  "description": "A super cute cottage where you can live out your fairytale dreams!",
+  "price": 250.0,
+  "latitude": 36.7489,
+  "longitude": -119.7722,
+  "owner_id": "YOUR_ACTUAL_USER_ID_HERE",
+  "amenities": ["YOUR_ACTUAL_WIFI_ID_HERE", "YOUR_ACTUAL_POOL_ID_HERE"],
+  "created_at": "2026-03-03T10:30:00.123456",
+  "updated_at": "2026-03-03T10:30:00.123456"
+}
+```
 #### GET ALL PLACES
 Get all places as a list with this curl command: 
 ```bash
 curl -X GET http://127.0.0.1:5000/api/v1/places/
 ```
-
+**Expected Response**
+```json
+[
+  {
+    "id": "cottage789",
+    "title": "Fantabulous Cottage in the Woods",
+    "description": "A super cute cottage where you can live out your fairytale dreams!",
+    "price": 250.0,
+    "latitude": 36.7489,
+    "longitude": -119.7722,
+    "owner": {
+      "id": "YOUR_ACTUAL_USER_ID_HERE",
+      "first_name": "Katrina",
+      "last_name": "Catworthy",
+      "email": "kitty.cat@example.com"
+    },
+    "amenities": [
+      {
+        "id": "YOUR_ACTUAL_WIFI_ID_HERE",
+        "name": "WiFi"
+      }
+    ],
+    "created_at": "2026-03-03T10:30:00.123456",
+    "updated_at": "2026-03-03T10:30:00.123456"
+  }
+]
+```
 #### GET PLACE BY ID
 Get a specific place with an id with this curl command (replace cottage789 with a valid place_id):
 ```bash
 curl -X GET http://127.0.0.1:5000/api/v1/places/cottage789
 ```
-
+**Expected Response:**
+```json
+{
+  "id": "cottage789",
+  "title": "Beach House",
+  "description": "Beautiful oceanfront property",
+  "price": 250.0,
+  "latitude": 36.7489,
+  "longitude": -119.7722,
+  "owner": {
+    "id": "YOUR_ACTUAL_USER_ID_HERE",
+    "first_name": "Katrina",
+    "last_name": "Catworthy",
+    "email": "kitty.cat@example.com"
+  },
+  "amenities": [
+    {
+      "id": "YOUR_ACTUAL_WIFI_ID_HERE",
+      "name": "WiFi"
+    }
+  ],
+  "created_at": "2026-03-03T10:30:00.123456",
+  "updated_at": "2026-03-03T10:30:00.123456"
+}
+```
 #### UPDATE PLACE
 Update an existing place with the fields that require change.
 ```bash
@@ -136,6 +201,22 @@ curl -X PUT http://127.0.0.1:5000/api/v1/places/cottage789 \
     "price": 300.00
   }'
 ```
+**Expected Response:**
+```json
+{
+  "id": "cottage789",
+  "title": "Updated Beach House",
+  "description": "Newly renovated oceanfront property",
+  "price": 300.0,
+  "latitude": 36.7489,
+  "longitude": -119.7722,
+  "owner_id": "YOUR_ACTUAL_USER_ID_HERE",
+  "amenities": ["YOUR_ACTUAL_WIFI_ID_HERE"],
+  "created_at": "2026-03-03T10:30:00.123456",
+  "updated_at": "2026-03-03T11:45:00.123456"
+}
+```
+
 
 ### AMENITY MANAGEMENT
 
