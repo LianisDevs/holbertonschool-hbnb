@@ -57,7 +57,7 @@ class User(BaseModel):
     def email(self, value):
         try:
             email_info = validate_email(value, check_deliverability=False)
-            self.__email = email_info
+            self.__email = email_info.normalized
         except EmailNotValidError:
             raise EmailNotValidError("User email must be a valid email address")
  
@@ -65,7 +65,7 @@ class User(BaseModel):
     @property
     def is_admin(self):
         return self.__is_admin
- 
+
     """Set value for admin"""
     @is_admin.setter
     def is_admin(self, value):
