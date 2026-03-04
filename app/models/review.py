@@ -57,3 +57,20 @@ class Review(BaseModel):
     @user_id.setter
     def user_id(self, value):
         self.__user_id = value
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "rating": self.rating,
+            "user_id": self.user_id,
+            "place_id": self.place_id
+        };
+
+    def to_json_id_text_rating(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "rating": self.rating,
+        };
+
