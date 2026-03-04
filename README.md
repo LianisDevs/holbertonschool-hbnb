@@ -317,6 +317,8 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6
 // 200 OK
 ```
 #### CREATE PLACE
+Before completing these tests, ensure you have a valid user UUID generated from creating a User (found in the User section). You will also need to create two distinct amenities with their own valid ids (create an amenity using instructions from the Amenity section).
+
 To create a Place using the JSON format, you can use the below example. Fill in the required fields within acceptable ranges. 
 
 Requirements: 
