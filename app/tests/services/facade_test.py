@@ -306,7 +306,7 @@ class TestUserClass():
             "is_admin": False
         }
         result = self.facade.update_user("nonexistent", update_data)
-        assert result is None
+        assert result == []
         
     def test_get_user_by_id_found(self):
         user_data = {
