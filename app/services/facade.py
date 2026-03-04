@@ -3,6 +3,7 @@ from app.models.place import Place
 from app.models.amenity import Amenity
 from app.models.user import User
 from app.persistence.repository import InMemoryRepository
+from app.utils.errors.review_errors import ReviewInvalidDataError, ReviewNotFoundError
 
 class HBnBFacade:
     def __init__(self):
@@ -111,6 +112,7 @@ class HBnBFacade:
             return None
 
         review = Review(review_data["text"], review_data["rating"], place.id, user.id)
+        #Add review to database
         self.review_repo.add(review)
         return review
 
@@ -119,13 +121,12 @@ class HBnBFacade:
         """Fetches review, returns None if no matching review"""
         review = self.review_repo.get(review_id)
         if review is None:
-            return None
+            raise ReviewNotFoundError
         return review
 
 
     def get_all_reviews(self):
         """Fetches all reviews, returns None if no reviews or list of reviews"""
-
         reviews = self.review_repo.get_all()
         if reviews is None:
             return []
@@ -137,8 +138,10 @@ class HBnBFacade:
         Fetches all reviews and filters by place_id
         Returns empty list if no reviews or list of reviews
         """
+        #get all reviews
         reviews = self.review_repo.get_all()
         place_reviews = []
+        #filter through the list of reviews, append reviews to place_reviews list
         for val in reviews:
             if val.place_id == place_id:
                 place_reviews.append(val)
@@ -154,11 +157,11 @@ class HBnBFacade:
 
         review = self.get_review(review_id)
         if review is None:
-            return None
+            raise ReviewNotFoundError()
 
         for key in review_data.keys():
             if key not in dir(review):
-                return None
+                raise ReviewInvalidDataError()
 
         self.review_repo.update(review_id, review_data)
 
@@ -174,7 +177,7 @@ class HBnBFacade:
         """
         review = self.get_review(review_id)
         if review is None:
-            return None
+            raise ReviewNotFoundError
 
         self.review_repo.delete(review_id)
 
@@ -214,3 +217,5 @@ class HBnBFacade:
         self.amenity_repo.delete(amenity_id)
 
         return amenity
+
+facade = HBnBFacade()

@@ -7,7 +7,7 @@ from app.services.facade import HBnBFacade
 from app.models.review import Review
 from app.models.amenity import Amenity
 from app.persistence.repository import InMemoryRepository
-from app.services.facade import HBnBFacade
+from app.utils.errors.review_errors import ReviewInvalidDataError, ReviewNotFoundError
 
 class TestReviewClass():
     facade = HBnBFacade()
@@ -19,7 +19,7 @@ class TestReviewClass():
 
     def test_create_review(self):
         """
-        Test: create_review()
+        Test: create_review(
         review is a Review class
         Correct attributes
         Values passed are on this instance
@@ -49,6 +49,7 @@ class TestReviewClass():
             "rating": 3
         }
         review = self.facade.create_review(2, self.place.id, review_data)
+
         assert review == None
 
 
@@ -84,8 +85,8 @@ class TestReviewClass():
         Test: get_review()
         If review is not valid- return None
         """
-        review = self.facade.get_review(1)
-        assert review == None
+        with pytest.raises(ReviewNotFoundError):
+            review = self.facade.get_review(1)
 
 
     def test_get_all_reviews(self):
@@ -207,8 +208,8 @@ class TestReviewClass():
             "text": "Slept good",
             "rating": 5
         }
-        review = self.facade.update_review(2, review_data)
-        assert review == None
+        with pytest.raises(ReviewNotFoundError):
+            review = self.facade.update_review(2, review_data)
 
 
     def test_update_review_if_review_data_is_not_valid(self):
@@ -225,8 +226,8 @@ class TestReviewClass():
         updated_review_data = {
             "abc": 5
         }
-        review = self.facade.update_review(review.id, updated_review_data)
-        assert review == None
+        with pytest.raises(ReviewInvalidDataError):
+            review = self.facade.update_review(review.id, updated_review_data)
 
 
     def test_delete_review(self):
@@ -242,13 +243,14 @@ class TestReviewClass():
         }
         review = self.facade.create_review(self.user.id, self.place.id, review_data)
         self.facade.delete_review(review.id)
-        deleted_review = self.facade.get_review(review.id)
-        assert deleted_review == None
+        with pytest.raises(ReviewNotFoundError):
+            deleted_review = self.facade.get_review(review.id)
 
     def test_delete_review_if_review_is_not_valid(self):
-        self.facade.delete_review(1)
-        deleted_review = self.facade.get_review(1)
-        assert deleted_review == None
+        with pytest.raises(ReviewNotFoundError):
+            self.facade.delete_review(1)
+
+
 class TestUserClass():
     facade = HBnBFacade()
 
