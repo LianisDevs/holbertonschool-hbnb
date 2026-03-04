@@ -24,12 +24,13 @@ class HBnBFacade:
     def update_user(self, user_id, user_data):
         user = self.user_repo.get(user_id)
         if user is None:
-            return None
+            return []
         
         user.first_name = user_data.get("first_name", user.first_name)
         user.last_name = user_data.get("last_name", user.last_name)
         user.email = user_data.get("email", user.email)
         user.is_admin = user_data.get("is_admin", user.is_admin)
+        
         return user
 
     def get_user(self, user_id):
