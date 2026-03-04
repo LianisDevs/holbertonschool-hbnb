@@ -6,41 +6,44 @@ This Repository contains the files for the HBNB project. HBNB replicates the bas
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
+	- [User](#user)
+	- [Place](#place)
+	- [Review](#review)
+	- [Ammenity](#ammenity)
 - [Files](#files)
 - [Authors](#authors)
----
+
 # Features
-CRUD capabilites for User/ Place/ Review/ Ammenities (please note User, Place and Ammenities cannot delete in this version this will be implemented in a future version)
+CRUD capabilites for User/ Place/ Review/ Ammenities 
+(please note User cannot delete in this version this will be implemented in a future version)
 
 # Requirements
-
 This project requires Python version 3.14 or later. To check what version of Python you have installed use the command below:
-```
+```bash
 > python --version
 ```
-
 # Installation
 1. Clone the repository locally
-```
+```bash
 > git clone https://github.com/LianisDevs/holbertonschool-hbnb
 ```
 2. Navigate to this directory
-```
+```bash
 > cd holbertonschool-hbnb
 ```
 3. Install the dependencies using
-```
+```bash
 > pip install -r requirements.txt
 ```
 
 # Usage
-Run the application
-```
+Run the application from the holbertonschool-hbnb directory
+```bash
 > python3 run.py
 ```
 Use tools like Postman or cURL to use the API endpoints, below examples use curl:
-### CREATE A USER
-Once necessary validation has been implemented, tests can be performed using cURL. Below are some examples of different test scenarios:
+
+## User
 
 #### Testing the Creation of a User
 ```bash
@@ -316,7 +319,7 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6
 
 // 200 OK
 ```
-#### CREATE PLACE
+## Place
 Before completing these tests, ensure you have a valid user UUID generated from creating a User (found in the User section). You will also need to create two distinct amenities with their own valid ids (create an amenity using instructions from the Amenity section).
 
 To create a Place using the JSON format, you can use the below example. Fill in the required fields within acceptable ranges. 
@@ -345,7 +348,7 @@ curl -X POST http://127.0.0.1:5000/api/v1/places/ \
   }'
   ```
   **Expected Response:**
-```json
+```jsonc
 {
   "id": "cottage789",
   "title": "Fantabulous Cottage in the Woods",
@@ -358,15 +361,16 @@ curl -X POST http://127.0.0.1:5000/api/v1/places/ \
   "created_at": "2026-03-03T10:30:00.123456",
   "updated_at": "2026-03-03T10:30:00.123456"
 }
+
+// 201 Created
 ```
-**Status Code:** 201 Created
 #### GET ALL PLACES
 Get all places as a list with this curl command: 
 ```bash
 curl -X GET http://127.0.0.1:5000/api/v1/places/
 ```
 **Expected Response:**
-```json
+```jsonc
 [
   {
     "id": "cottage789",
@@ -391,8 +395,9 @@ curl -X GET http://127.0.0.1:5000/api/v1/places/
     "updated_at": "2026-03-03T10:30:00.123456"
   }
 ]
+
+// 200 OK
 ```
-**Status Code:** 200 OK
 
 #### GET PLACE BY ID
 Get a specific place with an id with this curl command (replace cottage789 with a valid place_id):
@@ -400,7 +405,7 @@ Get a specific place with an id with this curl command (replace cottage789 with 
 curl -X GET http://127.0.0.1:5000/api/v1/places/cottage789
 ```
 **Expected Response:**
-```json
+```jsonc
 {
   "id": "cottage789",
   "title": "Beach House",
@@ -423,9 +428,9 @@ curl -X GET http://127.0.0.1:5000/api/v1/places/cottage789
   "created_at": "2026-03-03T10:30:00.123456",
   "updated_at": "2026-03-03T10:30:00.123456"
 }
-```
-**Status Code:** 200 OK
 
+// 200 OK
+```
 #### UPDATE PLACE
 Update an existing place with the fields that require change.
 ```bash
@@ -438,7 +443,7 @@ curl -X PUT http://127.0.0.1:5000/api/v1/places/cottage789 \
   }'
 ```
 **Expected Response:**
-```json
+```jsonc
 {
   "id": "cottage789",
   "title": "Updated Beach House",
@@ -451,18 +456,19 @@ curl -X PUT http://127.0.0.1:5000/api/v1/places/cottage789 \
   "created_at": "2026-03-03T10:30:00.123456",
   "updated_at": "2026-03-03T11:45:00.123456"
 }
-```
-**Status Code:** 200 OK
 
+// 200 OK
+```
+## Review
 #### CREATE A REVIEW
 To create a review you need a valid user_id and place_id, make sure you replace the user_id and place_id in the curl command:
-```
+```bash
 curl -X POST http://127.0.0.1:5000/api/v1/reviews/ \
      -H "Content-Type: application/json" \
      -d '{"text": "Dream stay, can't wait to go back!", "rating": 5, "user_id": <add user_id>, "place_id": <add place_id>}'
 ```
 Expected response valid data:
-```
+```jsonc
 {
   "id": "<review_id>",
   "text": "Great place to stay!",
@@ -474,20 +480,20 @@ Expected response valid data:
 // 201 Created
 ```
 Expected response invalid data:
-```
+```jsonc
 "Invalid input data"
 
 // 400 Bad Request
 ```
 #### UPDATE REVIEW
 To update a review you need a valid review_id, make sure you replace the review_id in the curl command:
-```
+```bash
 curl -X PUT http://127.0.0.1:5000/api/v1/reviews/<review_id> \
      -H "Content-Type: application/json" \
      -d '{"text": "Horrible stay, ", "rating": 1}'
 ```
 Expected response valid data:
-```
+```jsonc
 {
   "message": "Review updated successfully"
 }
@@ -495,13 +501,13 @@ Expected response valid data:
 // 200 OK
 ```
 Expected response invalid review_id:
-```
+```jsonc
 "Review not found"
 
 // 404 Not found
 ```
 Expected response invalid review data:
-```
+```jsonc
 "Invalid input data"
 
 // 400 Bad request
@@ -509,11 +515,11 @@ Expected response invalid review data:
 
 #### GET REVIEW BY ID
 To get a review by id you need a valid review_id, make sure you replace the review_id in the curl command:
-```
+```bash
 curl -X GET http://127.0.0.1:5000/api/v1/reviews/<review_id>
 ```
 Expected response valid data:
-```
+```jsonc
 {
   "id": "<review_id>",
   "text": "Great place to stay!",
@@ -525,18 +531,18 @@ Expected response valid data:
 // 200 OK
 ```
 Expected response invalid review_id:
-```
+```jsonc
 "Review not found"
 
 // 404 Not found
 ```
 #### GET ALL REVIEWS
 To get all reviews:
-```
+```bash
 curl -X GET http://127.0.0.1:5000/api/v1/reviews/
 ```
 Expected response if there's reviews in memory:
-```
+```jsonc
 [
   {
     "id": "<review_id>",
@@ -549,18 +555,18 @@ Expected response if there's reviews in memory:
 // 200 OK
 ```
 Expected response if no reviews in memory:
-```
+```jsonc
 []
 
 // 200 OK
 ```
 #### DELETE REVIEW
 To delete a review you need a valid review_id, make sure you replace the review_id in the curl command:
-```
+```bash
 curl -X DELETE http://127.0.0.1:5000/api/v1/reviews/<review_id>
 ```
 Expected response valid data:
-```
+```jsonc
 {
   "message": "Review deleted successfully"
 }
@@ -568,27 +574,28 @@ Expected response valid data:
 // 200 OK
 ```
 Expected response invalid review_id:
-```
+```jsonc
 "Review not found"
 
 // 404 Not found
 ```
+## Ammenity
 #### CREATE AMENITY
 
 To Create an amenity, and keeping it clear using the JSON format. Use the below example, while filling the "name" field, with your desired Amenity name.
-```
+```bash
 curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
      -H "Content-Type: application/json" \
      -d '{"name":"Your Amenity Name Here"}'
 ```
-```
+```bash
 curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
      -H "Content-Type: application/json" \
      -d '{"name":"Your Second Amenity Name Here"}'
 
 ```
 **Expected Output**
-```
+```jsonc
 {
   "id": 1,
   "name": "Your Amenity Name Here"
@@ -602,11 +609,11 @@ curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
 #### GET ALL AMENITIES
 
 To get a list of all the current Amenities, you can just use the simple curl command below
-```
+```bash
 curl http://127.0.0.1:5000/api/v1/amenities/
 ```
 **Expected Output**
-```
+```jsonc
 [
   {
     "id": 1,
@@ -622,11 +629,11 @@ curl http://127.0.0.1:5000/api/v1/amenities/
 #### GET AMENITY BY ID
 
 To list an amenity based on it's ID, use the following curl command.
-```
+```bash
 curl http://127.0.0.1:5000/api/v1/amenities/<1>
 ```
 **Expected Output**
-```
+```jsonc
 {
    "id": 1,
    "name": "Your Amenity Name Here"
@@ -636,13 +643,13 @@ curl http://127.0.0.1:5000/api/v1/amenities/<1>
 #### CHANGE THE NAME OF AN AMENITY, USING ID
 
 To change the details of an amenity (name), use the following command.
-```
+```bash
 curl -X PUT http://127.0.0.1:5000/api/v1/amenities/1 \
 -H "Content-Type: application/json" \
 -d '{"name": "Updated Name"}'
 ```
 **Expected Output**
-```
+```jsonc
 {
   "id": 1,
   "name": "Updated Name"
@@ -681,21 +688,19 @@ hbnb/
 │   │       ├── __init__.py
 │   │       ├──review_errors.py
 │   ├── tests/
+│   │   ├── api/
+│   │		├── ammenity_test.py
+│   │   ├── models/
+│   │		├── model_test.py
 │   │   ├── services/
 │   │		├── facade_test.py
+│   │		├── place_test.py
 ├── run.py
 ├── config.py
 ├── requirements.txt
 ├── README.md
 ```
-* config.py
-    * This will be used for configuring enviornment variables and application settings
 
-* requirements.txt
-    * This will list all the python packages needed for the project
-
-* run.py
-    * This is the entry point for running the Flask application
 
 ### APP
 * The app/ directory contains the core application code
@@ -739,6 +744,14 @@ hbnb/
     * errors/
 		* __init__.py
 		* review_errors.py
+* config.py
+    * This will be used for configuring enviornment variables and application settings
+	
+* requirements.txt
+    * This will list all the python packages needed for the project
+
+* run.py
+    * This is the entry point for running the Flask application
 
 # AUTHORS
 - **Liani Mckeown**
