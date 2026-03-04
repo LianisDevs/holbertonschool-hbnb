@@ -25,12 +25,13 @@ class HBnBFacade:
     def update_user(self, user_id, user_data):
         user = self.user_repo.get(user_id)
         if user is None:
-            return None
+            return []
         
         user.first_name = user_data.get("first_name", user.first_name)
         user.last_name = user_data.get("last_name", user.last_name)
         user.email = user_data.get("email", user.email)
         user.is_admin = user_data.get("is_admin", user.is_admin)
+        
         return user
 
     def get_user(self, user_id):
@@ -58,7 +59,14 @@ class HBnBFacade:
         if user is None:
             return None
         #create place instance
-        place = Place(place_data["title"], place_data["price"], place_data["latitude"], place_data["longitude"], user.id)
+        place = Place(
+            place_data["title"], 
+            place_data["price"], 
+            place_data["latitude"], 
+            place_data["longitude"], 
+            user.id, 
+            place_data.get("description")
+        )
        
        # Add place to repository
         self.place_repo.add(place)
@@ -175,6 +183,8 @@ class HBnBFacade:
 
 
     def create_amenity(self, amenity_data):
+        if not amenity_data.get("name"):
+            return None
         amenity = Amenity(amenity_data["name"])
         # add amenity to local storage
         self.amenity_repo.add(amenity)
@@ -192,6 +202,9 @@ class HBnBFacade:
             return None
 
         for key, value in amenity_data.items():
+            if key == "name":
+                if not value or not value.strip():
+                    return None
             setattr(amenity, key, value)
         
         return amenity        
