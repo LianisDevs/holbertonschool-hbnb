@@ -13,10 +13,15 @@ class AmenityList(Resource):
     @api.expect(amenity_model, validate=True)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Amenity already exists')
+    @api.response(400, 'Missing Required Fields')
     def post(self):
         """Register a new amenity"""
         amenity_data = api.payload
         
+        name = amenity_data.get("name")
+        if not name or not name.strip():
+            return {'error': 'missing fields'}, 400
+
         existing_amenity = None
         for a in facade.get_all_amenities():
             if a.name == amenity_data.get("name"):
@@ -52,9 +57,14 @@ class AmenityResource(Resource):
     @api.response(200, 'Amenity updated successfully')
     @api.response(400, 'Invalid input data')
     @api.response(404, 'Amenity not found')
+    @api.response(400, 'Missing Required Fields')
     def put(self, amenity_id):
         """Update an amenity's information"""
         amenity_data = api.payload
+
+        name = amenity_data.get("name")
+        if not name or not name.strip():
+            return {'error': 'missing fields'}, 400
 
         amenity = facade.get_amenity(amenity_id)
         if amenity is None:

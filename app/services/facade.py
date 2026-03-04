@@ -180,6 +180,8 @@ class HBnBFacade:
 
 
     def create_amenity(self, amenity_data):
+        if not amenity_data.get("name"):
+            return None
         amenity = Amenity(amenity_data["name"])
         # add amenity to local storage
         self.amenity_repo.add(amenity)
@@ -197,6 +199,9 @@ class HBnBFacade:
             return None
 
         for key, value in amenity_data.items():
+            if key == "name":
+                if not value or not value.strip():
+                    return None
             setattr(amenity, key, value)
         
         return amenity        
