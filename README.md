@@ -53,8 +53,7 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
   -d '{
     "first_name": "John",
     "last_name": "Smith",
-    "email": "john.smith@example.com",
-    "is_admin": false
+    "email": "john.smith@example.com"
   }'
 ```
 
@@ -65,8 +64,7 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
     "id": "b0fc1e80-e91d-43d0-bb4d-c686952adeff",
     "first_name": "John",
     "last_name": "Smith",
-    "email": "john.smith@example.com",
-    "is_admin": false
+    "email": "john.smith@example.com"
 }
 
 // 201 Created
@@ -80,8 +78,7 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
   -d '{
     "first_name": "John",
     "last_name": "Smith",
-    "email": "john.smith@example.com",
-    "is_admin": false
+    "email": "john.smith@example.com"
   }'
 ```
 **Expected Response**
@@ -99,8 +96,7 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
   -H "Content-Type: application/json" \
   -d '{
     "last_name": "Smith",
-    "email": "john.smith@example.com",
-    "is_admin": false
+    "email": "john.smith@example.com"
   }'
 ```
 **Expected Response**
@@ -121,8 +117,7 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
   -d '{
     "first_name": "John",
     "last_name": "Smith",
-    "email": "not-a-valid-email",
-    "is_admin": false
+    "email": "not-a-valid-email"
   }'
 ```
 
@@ -149,15 +144,13 @@ curl -X GET "http://127.0.0.1:5000/api/v1/users/"
         "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
         "first_name": "John",
         "last_name": "Smith",
-        "email": "john.smith@example.com",
-        "is_admin": false
+        "email": "john.smith@example.com"
     },
     {
         "id": "11c914d0-d55b-58e2-c1g3-990639b7b127",
         "first_name": "Alice",
         "last_name": "Wonder",
-        "email": "alice.wonder@example.com",
-        "is_admin": false
+        "email": "alice.wonder@example.com"
     }
 ]
 
@@ -188,8 +181,7 @@ curl -X GET "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6
     "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
     "first_name": "John",
     "last_name": "Smith",
-    "email": "john.smith@example.com",
-    "is_admin": false
+    "email": "john.smith@example.com"
 }
 
 // 200 OK
@@ -222,8 +214,7 @@ curl -X GET "http://127.0.0.1:5000/api/v1/users/email/john.smith@example.com"
     "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
     "first_name": "John",
     "last_name": "Smith",
-    "email": "john.smith@example.com",
-    "is_admin": false
+    "email": "john.smith@example.com"
 }
 
 // 200 OK
@@ -255,8 +246,7 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6
   -d '{
     "first_name": "Jonathan",
     "last_name": "Smith",
-    "email": "jonathan.smith@example.com",
-    "is_admin": false
+    "email": "jonathan.smith@example.com"
   }'
 ```
 
@@ -267,8 +257,7 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6
     "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
     "first_name": "Jonathan",
     "last_name": "Smith",
-    "email": "jonathan.smith@example.com",
-    "is_admin": false
+    "email": "jonathan.smith@example.com"
 }
 
 // 200 OK
@@ -281,8 +270,7 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/nonexistent-id-999" \
   -d '{
     "first_name": "Ghost",
     "last_name": "User",
-    "email": "ghost@example.com",
-    "is_admin": false
+    "email": "ghost@example.com"
   }'
 ```
 
@@ -314,8 +302,7 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6
     "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
     "first_name": "Johnny",
     "last_name": "Smith",
-    "email": "john.smith@example.com",
-    "is_admin": false
+    "email": "john.smith@example.com"
 }
 
 // 200 OK
