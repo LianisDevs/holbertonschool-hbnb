@@ -258,22 +258,19 @@ class TestUserClass():
         user_data = {
             "first_name": "John",
             "last_name": "Smith",
-            "email": "js@gmail.com",
-            "is_admin": False
+            "email": "js@gmail.com"
         }
         user = self.facade.create_user(user_data)
         assert isinstance(user, User)
         assert user.first_name == "John"
         assert user.last_name == "Smith"
         assert user.email  == "js@gmail.com"
-        assert user.is_admin == False
     
     def test_email_already_registered(self):
         user_data = {
             "first_name": "John",
             "last_name": "Smith",
-            "email": "js@gmail.com",
-            "is_admin": False
+            "email": "js@gmail.com"
         }
         self.facade.create_user(user_data)
         existing_user = self.facade.get_user_by_email("js@gmail.com")
@@ -283,15 +280,13 @@ class TestUserClass():
         user_data = {
             "first_name": "Old",
             "last_name": "Name",
-            "email": "oldname@gmail.com",
-            "is_admin": False
+            "email": "oldname@gmail.com"
         }
         user = self.facade.create_user(user_data)
         update_data = {
             "first_name": "New",
             "last_name": "Name",
-            "email": "newname@gmail.com",
-            "is_admin": False
+            "email": "newname@gmail.com"
         }
         updated_user = self.facade.update_user(user.id, update_data)
         assert updated_user is not None
@@ -302,8 +297,7 @@ class TestUserClass():
         update_data = {
             "first_name": "Ghost",
             "last_name": "User",
-            "email": "ghost@gmail.com",
-            "is_admin": False
+            "email": "ghost@gmail.com"
         }
         result = self.facade.update_user("nonexistent", update_data)
         assert result == []
@@ -312,8 +306,7 @@ class TestUserClass():
         user_data = {
             "first_name": "Jane",
             "last_name": "Doe",
-            "email": "jane@gmail.com",
-            "is_admin": False
+            "email": "jane@gmail.com"
         }
         user = self.facade.create_user(user_data)
         found_user = self.facade.get_user(user.id)
@@ -330,8 +323,7 @@ class TestUserClass():
         user_data = {
             "first_name": "Sam",
             "last_name": "Adams",
-            "email": "sam@gmail.com",
-            "is_admin": False
+            "email": "sam@gmail.com"
         }
         self.facade.create_user(user_data)
         found_user = self.facade.get_user_by_email("sam@gmail.com")
@@ -347,14 +339,12 @@ class TestUserClass():
         user_data_1 = {
             "first_name": "Alice",
             "last_name": "Wonder",
-            "email": "alice@gmail.com",
-            "is_admin": False
+            "email": "alice@gmail.com"
         }
         user_data_2 = {
             "first_name": "Bob",
             "last_name": "Builder",
-            "email": "bob@gmail.com",
-            "is_admin": False
+            "email": "bob@gmail.com"
         }
         self.facade.create_user(user_data_1)
         self.facade.create_user(user_data_2)

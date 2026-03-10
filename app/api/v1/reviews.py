@@ -20,8 +20,7 @@ class Mock(Resource):
         user = {
             "first_name": "John",
             "last_name": "Smith",
-            "email": "johnsmith@gmail.com",
-            "is_admin": False
+            "email": "johnsmith@gmail.com"
         }
         user = facade.create_user(user)
 
