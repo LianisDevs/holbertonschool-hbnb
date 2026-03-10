@@ -3,7 +3,9 @@ from app.models.place import Place
 from app.models.amenity import Amenity
 from app.models.user import User
 from app.persistence.repository import InMemoryRepository
-from app.utils.errors.review_errors import ReviewInvalidDataError, ReviewNotFoundError
+from app.utils.errors.place_errors import PlaceNotFoundError
+from app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
+from app.utils.errors.user_errors import UserNotFoundError
 
 class HBnBFacade:
     def __init__(self):
@@ -104,12 +106,19 @@ class HBnBFacade:
         #check if user id is in database
         user = self.user_repo.get(user_id)
         if user is None:
-            return None
+            raise UserNotFoundError
 
         #check if place id is in database
         place = self.place_repo.get(place_id)
         if place is None:
-            return None
+            raise PlaceNotFoundError
+
+        #get all reviews
+        reviews = self.review_repo.get_all()
+        #filter through the list of reviews, append reviews to place_reviews list
+        for val in reviews:
+            if val.place_id == place_id and val.user_id == user_id:
+                raise ReviewAlreadyExistsError
 
         review = Review(review_data["text"], review_data["rating"], place.id, user.id)
         #Add review to database
@@ -157,11 +166,11 @@ class HBnBFacade:
 
         review = self.get_review(review_id)
         if review is None:
-            raise ReviewNotFoundError()
+            raise ReviewNotFoundError
 
         for key in review_data.keys():
             if key not in dir(review):
-                raise ReviewInvalidDataError()
+                raise ReviewInvalidDataError
 
         self.review_repo.update(review_id, review_data)
 

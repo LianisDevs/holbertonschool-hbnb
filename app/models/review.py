@@ -36,7 +36,7 @@ class Review(BaseModel):
     def rating(self, value):
         if not value:
             raise ValueError("Review rating cannot be empty")
-        elif not isinstance(value, int):
+        elif not isinstance(value, int) or isinstance(value, bool):
             raise TypeError("Review rating must be an integer")
         elif value < 1 or value > 5:
             raise ValueError("Review rating must be between 1-5")

@@ -1,7 +1,9 @@
 from flask_restx import Namespace, Resource, fields
 from werkzeug.wrappers import response
 from app.services import facade
-from app.utils.errors.review_errors import ReviewInvalidDataError, ReviewNotFoundError
+from app.utils.errors.place_errors import PlaceNotFoundError
+from app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
+from app.utils.errors.user_errors import UserNotFoundError
 
 api = Namespace('reviews', description='Review operations')
 
@@ -38,6 +40,7 @@ class Mock(Resource):
             "place_id": place.id
         }, 200
 
+
 @api.route('/')
 class ReviewList(Resource):
     @api.expect(review_model)
@@ -47,9 +50,18 @@ class ReviewList(Resource):
         """Register a new review"""
         review_data = api.payload
 
-        new_review = facade.create_review(review_data["user_id"], review_data["place_id"], review_data)
-        if new_review is None:
-            return 'Invalid input data', 400
+        try:
+            new_review = facade.create_review(review_data["user_id"], review_data["place_id"], review_data)
+        except UserNotFoundError as e:
+            return {"error": "Invalid input data", "message": str(e)}, 400
+        except PlaceNotFoundError as e:
+            return {"error": "Invalid input data", "message": str(e)}, 400
+        except ReviewAlreadyExistsError as e:
+            return {"error": "Invalid input data", "message": str(e)}, 400
+        except ValueError as e:
+            return {"error": "Invalid input data", "message": str(e)}, 400
+        except TypeError as e:
+            return {"error": "Invalid input data", "message": str(e)}, 400
 
         data = new_review.to_json()
         return data, 201
@@ -73,7 +85,7 @@ class ReviewResource(Resource):
             json_fetched_review = fetched_review.to_json()
             return json_fetched_review, 200
         except ReviewNotFoundError:
-            return 'Review not found', 404
+            return {"error": "Review not found"}, 404
 
 
     @api.expect(review_model)
@@ -86,10 +98,14 @@ class ReviewResource(Resource):
         try:
             facade.update_review(review_id, review_data)
             return {'message': 'Review updated successfully'}, 200
+        except ValueError as e:
+            return {"error": "Invalid input data", "message": str(e)}, 400
+        except TypeError as e:
+            return {"error": "Invalid input data", "message": str(e)}, 400
         except ReviewNotFoundError:
-            return 'Review not found', 404
+            return {"error": "Review not found"}, 404
         except ReviewInvalidDataError:
-            return 'Invalid input data', 400
+            return {"error": "Invalid input data", "message": str(e)}, 400
 
 
     @api.response(200, 'Review deleted successfully')
@@ -98,6 +114,6 @@ class ReviewResource(Resource):
         """Delete a review"""
         try:
             facade.delete_review(review_id)
-            return 'Review deleted successfully', 200
+            return {'Review deleted successfully'}, 200
         except ReviewNotFoundError:
-            return 'Review not found', 404
+            return {"error": "Review not found"}, 404
