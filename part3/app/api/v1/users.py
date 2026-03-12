@@ -9,6 +9,7 @@ user_model = api.model('User', {
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
+    'password': fields.String(required=True, description='Password of the user'),
 })
 
 @api.route('/')
@@ -31,7 +32,7 @@ class UserList(Resource):
         except EmailNotValidError:
             return {'error': 'User email must be a valid email'}, 400
 
-        return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
+        return {'id': new_user.id, 'message': 'User created successfully'}, 201
 
     @api.response(200, 'Users retrieved successfully')
     def get(self):
