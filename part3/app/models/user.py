@@ -81,7 +81,7 @@ class User(BaseModel):
         """Hashes the password before storing it."""
         if password is None:
             raise ValueError("Password cannot be None")
-        return bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
