@@ -1,9 +1,10 @@
 from email_validator import validate_email, EmailNotValidError
 from part3.app.models.base_model import BaseModel
+from part3.app import bcrypt
 
 class User(BaseModel):
     """"User model"""
-    def __init__(self, first_name, last_name, email, is_admin=False, password):
+    def __init__(self, first_name, last_name, email, password, is_admin=False):
         super().__init__()
 
         self.first_name = first_name
@@ -78,6 +79,8 @@ class User(BaseModel):
 
     def hash_password(self, password):
         """Hashes the password before storing it."""
+        if password is None:
+            raise ValueError("Password cannot be None")
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
