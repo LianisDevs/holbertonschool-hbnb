@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
-from app.models import place
-from app.services import facade
+from part3.app.models import place
+from part3.app.services import facade
 
 api = Namespace('places', description='Place operations')
 

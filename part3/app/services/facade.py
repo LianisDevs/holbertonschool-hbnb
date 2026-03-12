@@ -1,11 +1,11 @@
-from app.models.review import Review
-from app.models.place import Place
-from app.models.amenity import Amenity
-from app.models.user import User
-from app.persistence.repository import InMemoryRepository
-from app.utils.errors.place_errors import PlaceNotFoundError
-from app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
-from app.utils.errors.user_errors import UserNotFoundError
+from part3.app.models.review import Review
+from part3.app.models.place import Place
+from part3.app.models.amenity import Amenity
+from part3.app.models.user import User
+from part3.app.persistence.repository import InMemoryRepository
+from part3.app.utils.errors.place_errors import PlaceNotFoundError
+from part3.app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
+from part3.app.utils.errors.user_errors import UserNotFoundError
 
 class HBnBFacade:
     def __init__(self):

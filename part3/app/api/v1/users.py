@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from app.services import facade
+from part3.app.services import facade
 from email_validator.exceptions import EmailNotValidError
 
 api = Namespace('users', description='User operations')
