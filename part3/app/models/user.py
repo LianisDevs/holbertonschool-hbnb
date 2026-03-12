@@ -1,16 +1,17 @@
 from email_validator import validate_email, EmailNotValidError
 from app.models.base_model import BaseModel
+from app import bcrypt
 
 class User(BaseModel):
     """"User model"""
-    def __init__(self, first_name, last_name, email, is_admin=False, password):
+    def __init__(self, first_name, last_name, email, password, is_admin=False):
         super().__init__()
 
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.is_admin = is_admin
-        self.password = password
+        self.hash_password(password)
 
     """Get Value for first name"""
     @property
@@ -78,8 +79,12 @@ class User(BaseModel):
 
     def hash_password(self, password):
         """Hashes the password before storing it."""
+        if not password:
+            raise ValueError("Password is required")
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
+        if not self.password:
+            return False
         return bcrypt.check_password_hash(self.password, password)
