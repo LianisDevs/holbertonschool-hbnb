@@ -53,7 +53,8 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
   -d '{
     "first_name": "John",
     "last_name": "Smith",
-    "email": "john.smith@example.com"
+    "email": "john.smith@example.com",
+    "password": "ilikecats"
   }'
 ```
 
@@ -69,6 +70,39 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
 
 // 201 Created
 ```
+#### Testing User Login 
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{
+  "email": "john.doe@example.com",
+  "password": "your_password"
+}'
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "access_token": "your_generated_jwt_token"
+}
+
+// 200 ok
+```
+
+#### Testing User Authorization
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/protected" -H "Authorization: Bearer your_generated_jwt_token"
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "message": "Hello, user 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+
+// 200 ok
+```
+
 #### Testing Email Already Registered
 First create a user, then attempt to register again with the same email.
 
