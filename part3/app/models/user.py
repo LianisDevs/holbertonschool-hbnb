@@ -11,7 +11,7 @@ class User(BaseModel):
         self.last_name = last_name
         self.email = email
         self.is_admin = is_admin
-        self.password = password
+        self.hash_password(password)
 
     """Get Value for first name"""
     @property
@@ -85,4 +85,7 @@ class User(BaseModel):
 
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
+        if not self.password:
+            return False
         return bcrypt.check_password_hash(self.password, password)
+
