@@ -1,4 +1,4 @@
-from app.models.base_model import BaseModel
+from part3.app.models.base_model import BaseModel
 
 
 class Amenity(BaseModel):

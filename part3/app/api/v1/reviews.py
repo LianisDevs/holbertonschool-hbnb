@@ -1,9 +1,9 @@
 from flask_restx import Namespace, Resource, fields
 from werkzeug.wrappers import response
-from app.services import facade
-from app.utils.errors.place_errors import PlaceNotFoundError
-from app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
-from app.utils.errors.user_errors import UserNotFoundError
+from part3.app.services import facade
+from part3.app.utils.errors.place_errors import PlaceNotFoundError
+from part3.app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
+from part3.app.utils.errors.user_errors import UserNotFoundError
 
 api = Namespace('reviews', description='Review operations')
 
@@ -20,7 +20,8 @@ class Mock(Resource):
         user = {
             "first_name": "John",
             "last_name": "Smith",
-            "email": "johnsmith@gmail.com"
+            "email": "johnsmith@gmail.com",
+            "password": "123"
         }
         user = facade.create_user(user)
 
