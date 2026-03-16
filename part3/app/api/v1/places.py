@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from part3.app.models import place
 from part3.app.services import facade
 
@@ -25,7 +26,6 @@ place_model = api.model('Place', {
     'price': fields.Float(required=True, description='Price per night'),
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
     'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
 })
 
@@ -34,22 +34,29 @@ class PlaceList(Resource):
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
-    @api.response(404, 'Owner not found')
+    @api.response(401, 'Authentication required')
+    @jwt_required()
     def post(self):
         """Register a new place"""
         try:
+            # Get current user from JWT token
+            current_user_id = get_jwt_identity()
+            
             place_data = request.get_json()
             
-            # Validate required fields
-            required_fields = ['title', 'price', 'latitude', 'longitude', 'owner_id', 'amenities']
+            # Validate required fields (owner_id is now set from JWT token)
+            required_fields = ['title', 'price', 'latitude', 'longitude', 'amenities']
             for field in required_fields:
                 if field not in place_data:
                     return {'error': f'Missing required field: {field}'}, 400
             
+            # Set owner_id from JWT token instead of request data
+            place_data['owner_id'] = current_user_id
+            
             # Check if owner exists
-            owner = facade.user_repo.get(place_data['owner_id'])
+            owner = facade.user_repo.get(current_user_id)
             if not owner:
-                return {'error': 'Owner not found'}, 404
+                return {'error': 'User not found'}, 404
             
             # Validate amenities exist
             amenity_objects = []
@@ -180,20 +187,24 @@ class PlaceResource(Resource):
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
+    @api.response(401, 'Authentication required')
+    @api.response(403, 'Unauthorized action')
+    @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
         try:
+            # Get current user from JWT token
+            current_user_id = get_jwt_identity()
+            
             place = facade.place_repo.get(place_id)
             if not place:
                 return {'error': 'Place not found'}, 404
             
-            update_data = request.get_json()
+            # Check if the current user is the owner of the place
+            if place.owner != current_user_id:
+                return {'error': 'Unauthorized action'}, 403
             
-            # Validate owner_id if provided
-            if 'owner_id' in update_data:
-                owner = facade.user_repo.get(update_data['owner_id'])
-                if not owner:
-                    return {'error': 'Owner not found'}, 404
+            update_data = request.get_json()
             
             # Validate amenities if provided
             if 'amenities' in update_data:
