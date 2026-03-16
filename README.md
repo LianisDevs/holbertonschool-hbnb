@@ -676,6 +676,82 @@ curl -X PUT http://127.0.0.1:5000/api/v1/amenities/1 \
 ```
 It is important that you change the "1" ID as this is how you specify which amenity is being changed
 
+## Test admin privileges
+
+**When site is run, log in to admin account using the following command. output will show a token to use for following commands**
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" \
+     -H "Content-Type: application/json" \
+     -d '{"email": "admin@hbnb.com", "password": "password123"}'
+```
+
+### Test creating new admin user
+
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/users/" -d '{"email": "newuser@example.com", "first_name": "Admin", "last_name": "User", "password": "123"}' -H "Authorization: Bearer <admin_token>" -H "Content-Type: application/json"
+```
+
+**Expected Output**
+```jsonc
+{
+    "id": "490a6259-9e6d-4417-b4a9-01313b02a5f5",
+    "message": "User created successfully"
+}
+```
+
+### Test Updating a user
+
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/<user_id>" \
+-H "Authorization: Bearer <admin_token>" \
+-H "Content-Type: application/json" \
+-d '{"first_name": "Sandy"}'
+```
+
+**Expected Output**
+
+```jsonc
+{
+    "id": "490a6259-9e6d-4417-b4a9-01313b02a5f5",
+    "first_name": "Sandy",
+    "last_name": "User",
+    "email": "newuser@example.com"
+}
+```
+
+### Test Adding amenity
+
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/amenities/" \
+-H "Authorization: Bearer <admin_token" \
+-H "Content-Type: application/json" \
+-d '{"name": "Swimming Pool"}'
+```
+
+**Expected Output**
+
+```jsonc
+{
+    "id": "f115a718-7dc9-4e78-a3fe-07f4f93ff523",
+    "name": "Swimming Pool"
+}
+```
+
+### Test updating amenity
+
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/amenities/<amenity_id>" -d '{"name": "Updated Amenity"}' -H "Authorization: Bearer <admin_token>" -H "Content-Type: application/json"
+```
+
+**Expected Output**
+
+```jsonc
+{
+    "id": "f115a718-7dc9-4e78-a3fe-07f4f93ff523",
+    "name": "Updated Amenity"
+}
+```
+
 # Tests
 This application has been tested using pytest. To run the tests created:
 ```bash

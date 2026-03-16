@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from werkzeug.wrappers import response
 from part3.app.services import facade
 from part3.app.utils.errors.place_errors import PlaceNotFoundError
@@ -124,10 +124,16 @@ class ReviewResource(Resource):
         # Get current user from JWT token
         current_user_id = get_jwt_identity()
 
+        # Get permissions from token
+        current_user = get_jwt()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+
         try:
             # Get the review and check ownership
             review = facade.get_review(review_id)
-            if review.user_id != current_user_id:
+            if not is_admin and review.user_id != current_user_id:
                 return {"error": "Unauthorized action."}, 403
 
             review_data = api.payload
@@ -156,10 +162,16 @@ class ReviewResource(Resource):
         # Get current user from JWT token
         current_user_id = get_jwt_identity()
 
+        # Get permissions from token
+        current_user = get_jwt()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+
         try:
-            # Get the review and check ownership
+            # Get the review and check ownership or admin status
             review = facade.get_review(review_id)
-            if review.user_id != current_user_id:
+            if not is_admin and review.user_id != current_user_id:
                 return {"error": "Unauthorized action."}, 403
 
             facade.delete_review(review_id)

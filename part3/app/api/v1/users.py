@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from part3.app.services import facade
 from email_validator.exceptions import EmailNotValidError
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 api = Namespace('users', description='User operations')
 
@@ -25,8 +25,21 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @api.response(403, 'Unauthorized action')
+    @jwt_required()
     def post(self):
         """Register a new user"""
+
+        # Retrieve permissions from the token
+        current_user = get_jwt()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+
+        # ADMIN CHECK
+        if not is_admin:
+            return {'error': 'Unauthorized action.'}, 403
+
         user_data = api.payload
 
         # Simulate email uniqueness check (to be replaced by real validation with persistence)
@@ -78,9 +91,15 @@ class UserResource(Resource):
         """Update a user"""
         # Get current user from JWT token
         current_user_id = get_jwt_identity()
+
+        # Retrieve permissions from the token
+        current_user = get_jwt()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
         
-        # Check if the current user is trying to update their own information
-        if current_user_id != user_id:
+        # Check if the current user or an admin is trying to update user information
+        if not is_admin and current_user_id != user_id:
             return {'error': 'Unauthorized action.'}, 403
         
         user_data = api.payload
