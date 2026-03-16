@@ -14,6 +14,26 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
+        self.setup_admin()
+
+    def setup_admin(self):
+        """Create an admin for testing"""
+        admin_data = {
+            "first_name": "Admin",
+            "last_name": "User",
+            "email": "admin@hbnb.com",
+            "password": "password123"
+        }
+
+        # Check if they already exist to avoid errors on restart
+        # Will need to be removed after testing/before launch!
+        if not self.get_user_by_email(admin_data['email']):
+            # Create admin account
+            admin = self.create_user(admin_data)
+            # set the is_admin flag to True
+            admin.is_admin = True 
+            print(f"Admin user created: {admin.email} (ID: {admin.id})")
+
     # Placeholder method for creating a user
     def create_user(self, user_data):
         #register user

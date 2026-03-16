@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from part3.app.models import place
 from part3.app.services import facade
 
@@ -192,16 +192,22 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
+        # Get current user from JWT token
+        current_user_id = get_jwt_identity()
+
+        # Retrieve permissions from the token
+        current_user = get_jwt()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+
         try:
-            # Get current user from JWT token
-            current_user_id = get_jwt_identity()
-            
             place = facade.place_repo.get(place_id)
             if not place:
                 return {'error': 'Place not found'}, 404
             
-            # Check if the current user is the owner of the place
-            if place.owner != current_user_id:
+            # Check if the current user is the owner of the place or and admin
+            if not is_admin and place.owner != current_user_id:
                 return {'error': 'Unauthorized action'}, 403
             
             update_data = request.get_json()
@@ -244,9 +250,47 @@ class PlaceResource(Resource):
         except Exception:
             return {'error': 'Internal server error'}, 500
 
+    @api.response(200, 'Place deleted successfully')
+    @api.response(404, 'Place not found')
+    @api.response(401, 'Authentication required')
+    @api.response(403, 'Unauthorized action')
+    @api.response(400, 'Failed to delete place')
+    @jwt_required()
+    def delete(self, place_id):
+        """Delete a place"""
+        # Get identity
+        current_user_id = get_jwt_identity()
+
+        # Get permissions
+        current_user = get_jwt()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+
+        try:
+            # 2. Check if place exists
+            place = facade.place_repo.get(place_id)
+            if not place:
+                return {'error': 'Place not found'}, 404
+
+            # 3. Check permissions: Admin OR Owner
+            if not is_admin and place.owner != current_user_id:
+                return {'error': 'Unauthorized action'}, 403
+
+            # 4. Execute deletion using your facade method
+            success = facade.delete_place(place_id)
+            
+            if success:
+                return {'message': 'Place deleted successfully'}, 200
+            else:
+                return {'error': 'Failed to delete place'}, 400
+
+        except Exception:
+            return {'error': 'Internal server error'}, 500
+
 
 @api.route('/<place_id>/reviews')
-class PlaceResource(Resource):
+class PlaceReviewList(Resource):
     @api.response(200, 'Review details retrieved successfully')
     @api.response(404, 'Place not found')
     def get(self, place_id):

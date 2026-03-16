@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from part3.app.services import facade
+from flask_jwt_extended import jwt_required, get_jwt
 
 api = Namespace('amenities', description='Amenity operations')
 
@@ -14,8 +15,21 @@ class AmenityList(Resource):
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Amenity already exists')
     @api.response(400, 'Missing Required Fields')
+    @api.response(403, 'Unauthorized action')
+    @jwt_required()
     def post(self):
         """Register a new amenity"""
+
+        # Retrieve permissions from the token
+        current_user = get_jwt()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+
+        # ADMIN CHECK
+        if not is_admin:
+            return {'error': 'Unauthorized action.'}, 403
+
         amenity_data = api.payload
         
         name = amenity_data.get("name")
@@ -58,8 +72,21 @@ class AmenityResource(Resource):
     @api.response(400, 'Invalid input data')
     @api.response(404, 'Amenity not found')
     @api.response(400, 'Missing Required Fields')
+    @api.response(403, 'Unauthorized action')
+    @jwt_required()
     def put(self, amenity_id):
         """Update an amenity's information"""
+
+        # Retrieve permissions from the token
+        current_user = get_jwt()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+
+        # ADMIN CHECK
+        if not is_admin:
+            return {'error': 'Unauthorized action.'}, 403
+
         amenity_data = api.payload
 
         name = amenity_data.get("name")
