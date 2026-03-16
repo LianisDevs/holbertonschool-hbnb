@@ -2,6 +2,7 @@ from part3.app.models.review import Review
 from part3.app.models.place import Place
 from part3.app.models.amenity import Amenity
 from part3.app.models.user import User
+from part3.app.persistence.repository import SQLAlchemyRepository
 from part3.app.persistence.repository import InMemoryRepository
 from part3.app.utils.errors.place_errors import PlaceNotFoundError
 from part3.app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
@@ -9,10 +10,10 @@ from part3.app.utils.errors.user_errors import UserNotFoundError
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = SQLAlchemyRepository(User)
+        self.place_repo = SQLAlchemyRepository(Place)
+        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(Amenity)
 
         self.setup_admin()
 
