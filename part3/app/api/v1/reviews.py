@@ -5,6 +5,8 @@ from part3.app.services import facade
 from part3.app.utils.errors.place_errors import PlaceNotFoundError
 from part3.app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
 from part3.app.utils.errors.user_errors import UserNotFoundError
+import os
+from part3.app import db
 
 api = Namespace('reviews', description='Review operations')
 
@@ -40,6 +42,21 @@ class Mock(Resource):
             "place_id": place.id
         }, 200
 
+@api.route('/restart_db')
+class MockRestart(Resource):
+    def delete(self):
+        from run import get_app
+        database_path = '/home/liani/Code/holbertonschool-hbnb/instance/development.db'
+
+        if os.path.exists(database_path):
+            os.remove(database_path)
+            print(f"Database file '{database_path}' deleted successfully.")
+        else:
+            print(f"Database file '{database_path}' does not exist.")
+
+        with get_app().app_context():
+            db.create_all()
+
 
 @api.route('/')
 class ReviewList(Resource):
@@ -56,7 +73,7 @@ class ReviewList(Resource):
 
         review_data = api.payload
 
-        # Set user_id from JWT token
+           # Set user_id from JWT token
         review_data['user_id'] = current_user_id
 
         try:
