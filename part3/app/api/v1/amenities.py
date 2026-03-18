@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from part3.app.services import facade
-from flask_jwt_extended import jwt_required, get_jwt
+from flask_jwt_extended import current_user, get_jwt_identity, jwt_required, get_jwt
 
 api = Namespace('amenities', description='Amenity operations')
 
@@ -21,10 +21,11 @@ class AmenityList(Resource):
         """Register a new amenity"""
 
         # Retrieve permissions from the token
-        current_user = get_jwt()
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+        admin = facade.get_user(current_user_id)
 
-        # Set is_admin default to False if not exists
-        is_admin = current_user.get('is_admin', False)
+        is_admin = claims.get('is_admin', False)
 
         # ADMIN CHECK
         if not is_admin:

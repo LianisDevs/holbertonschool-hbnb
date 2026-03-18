@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from part3.app.extensions import db
 from part3.app.models import user, place, review, amenity
 
+
 class Repository(ABC):
     @abstractmethod
     def add(self, obj):
