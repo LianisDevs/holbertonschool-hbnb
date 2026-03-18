@@ -3,6 +3,8 @@ from part3.app.services import facade
 from email_validator.exceptions import EmailNotValidError
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
+from part3.app.utils.errors.user_errors import UserNotFoundError
+
 api = Namespace('users', description='User operations')
 
 # Define the user model for input validation and documentation
@@ -19,6 +21,7 @@ user_update_model = api.model('UserUpdate', {
     'last_name': fields.String(description='Last name of the user'),
 })
 
+
 @api.route('/')
 class UserList(Resource):
     @api.expect(user_model, validate=True)
@@ -26,19 +29,8 @@ class UserList(Resource):
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
     @api.response(403, 'Unauthorized action')
-    @jwt_required()
     def post(self):
         """Register a new user"""
-
-        # Retrieve permissions from the token
-        current_user = get_jwt()
-
-        # Set is_admin default to False if not exists
-        is_admin = current_user.get('is_admin', False)
-
-        # ADMIN CHECK
-        if not is_admin:
-            return {'error': 'Unauthorized action.'}, 403
 
         user_data = api.payload
 
@@ -46,13 +38,14 @@ class UserList(Resource):
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
-        
+ 
         try:
             new_user = facade.create_user(user_data)
         except EmailNotValidError:
             return {'error': 'User email must be a valid email'}, 400
 
         return {'id': new_user.id, 'message': 'User created successfully'}, 201
+
 
     @api.response(200, 'Users retrieved successfully')
     def get(self):
@@ -68,7 +61,8 @@ class UserList(Resource):
             }
             for user in users
         ], 200
-        
+
+
 @api.route('/<user_id>')
 class UserResource(Resource):
     @api.response(200, 'User details retrieved successfully')
@@ -79,7 +73,8 @@ class UserResource(Resource):
         if not user:
             return {'error': 'User not found'}, 404
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
-    
+ 
+
     @api.expect(user_update_model, validate=False)
     @api.response(200, 'User successfully updated')
     @api.response(404, 'User not found')
@@ -91,34 +86,63 @@ class UserResource(Resource):
         """Update a user"""
         # Get current user from JWT token
         current_user_id = get_jwt_identity()
-
-        # Retrieve permissions from the token
-        current_user = get_jwt()
+        claims = get_jwt()
 
         # Set is_admin default to False if not exists
-        is_admin = current_user.get('is_admin', False)
-        
+        is_admin = claims.get('is_admin', False)
+ 
         # Check if the current user or an admin is trying to update user information
         if not is_admin and current_user_id != user_id:
             return {'error': 'Unauthorized action.'}, 403
-        
+ 
         user_data = api.payload
-        
+
+        print("Got user data ", user_data)
+
         # Check if user is trying to modify email or password (not allowed)
         if 'email' in user_data or 'password' in user_data:
             return {'error': 'You cannot modify email or password.'}, 400
-        
+ 
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
 
+        print("Got user ", user)
+
         updated_user = facade.update_user(user_id, user_data)
+
+        print("Updated user ", updated_user)
+
         return {
             'id': updated_user.id,
             'first_name': updated_user.first_name,
             'last_name': updated_user.last_name,
             'email': updated_user.email
         }, 200
+
+    @api.response(200, 'User deleted successfully')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'User not found')
+    @jwt_required()
+    def delete(self, user_id):
+        # Get current user from JWT token
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+
+        # Set is_admin default to False if not exists
+        is_admin = claims.get('is_admin', False)
+
+        # Check if the current user or an admin is trying to update user information
+        if not is_admin and current_user_id != user_id:
+            return {'error': 'Unauthorized action.'}, 403
+
+        try:
+            facade.delete_user(user_id)
+            return {"message": "User deleted successfully"}, 200
+        except UserNotFoundError:
+            return {"error": "User not found"}, 404
+
+
 
 @api.route('/email/<string:email>')
 class UserByEmail(Resource):
@@ -131,15 +155,16 @@ class UserByEmail(Resource):
             return {'error': 'User not found'}, 404
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
 
-@api.route('/protected')
-class ProtectedResource(Resource):
-    @jwt_required()
-    def get(self):
-         """A protected endpoint that requires a valid JWT token"""
-         print("jwt------")
-         print(get_jwt_identity())
-         current_user = get_jwt_identity() # Retrieve the user's identity from the token
-         #if you need to see if the user is an admin or not, you can access additional claims using get_jwt() :
-         # addtional claims = get_jwt()
-         #additional claims["is_admin"] -> True or False
-         return {'message': f'Hello, user {current_user}'}, 200
+
+# @api.route('/protected')
+# class ProtectedResource(Resource):
+#     @jwt_required()
+#     def get(self):
+#          """A protected endpoint that requires a valid JWT token"""
+#          print("jwt------")
+#          print(get_jwt_identity())
+#          current_user = get_jwt_identity() # Retrieve the user's identity from the token
+#          #if you need to see if the user is an admin or not, you can access additional claims using get_jwt() :
+#          # addtional claims = get_jwt()
+#          #additional claims["is_admin"] -> True or False
+#          return {'message': f'Hello, user {current_user}'}, 200
