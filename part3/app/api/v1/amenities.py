@@ -98,10 +98,7 @@ class AmenityResource(Resource):
         if amenity is None:
             return {'error': 'Amenity not found'}, 404
         
-        for key, value in amenity_data.items():
-            if hasattr(amenity, key):
-                setattr(amenity, key, value)
-            else:
-                return {'error': f'Invalid input data: {key}'}, 400
-        
-        return {"id": amenity.id, "name": amenity.name}, 200
+        updated_amenity = facade.update_amenity(amenity_id, amenity_data)
+        if not updated_amenity:
+            return {'error': 'Failed to update amenity'}, 400
+        return {"id": updated_amenity.id, "name": updated_amenity.name}, 200

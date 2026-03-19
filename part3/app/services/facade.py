@@ -240,13 +240,12 @@ class HBnBFacade:
         if not amenity:
             return None
 
-        for key, value in amenity_data.items():
-            if key == "name":
-                if not value or not value.strip():
-                    return None
-            setattr(amenity, key, value)
-
-        return amenity
+        if "name" in amenity_data:
+            if not amenity_data["name"] or not amenity_data["name"].strip():
+                return None
+    
+        self.amenity_repo.update(amenity_id, amenity_data)
+        return self.get_amenity(amenity_id)
 
     def delete_amenity(self, amenity_id):
         amenity = self.get_amenity(amenity_id)
