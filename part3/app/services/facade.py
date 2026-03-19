@@ -2,18 +2,22 @@ from part3.app.models.review import Review
 from part3.app.models.place import Place
 from part3.app.models.amenity import Amenity
 from part3.app.models.user import User
+from part3.app.persistence.class_repos.AmenityRepository import AmenityRepository
+from part3.app.persistence.class_repos.ReviewRepository import ReviewRepository
 from part3.app.persistence.class_repos.UserRepository import UserRepository
+from part3.app.persistence.class_repos.PlaceRepository import PlaceRepository
 from part3.app.persistence.repository import SQLAlchemyRepository
 from part3.app.utils.errors.place_errors import PlaceNotFoundError
 from part3.app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
 from part3.app.utils.errors.user_errors import UserNotFoundError
 
+
 class HBnBFacade:
     def __init__(self):
         self.user_repo = UserRepository()
-        self.place_repo = SQLAlchemyRepository(Place)
-        self.review_repo = SQLAlchemyRepository(Review)
-        self.amenity_repo = SQLAlchemyRepository(Amenity)
+        self.place_repo = PlaceRepository()
+        self.review_repo = ReviewRepository()
+        self.amenity_repo = AmenityRepository()
 
         # self.setup_admin()
 
@@ -32,29 +36,26 @@ class HBnBFacade:
             # Create admin account
             admin = self.create_user(admin_data)
             # set the is_admin flag to True
-            admin.is_admin = True 
+            admin.is_admin = True
             print(f"Admin user created: {admin.email} (ID: {admin.id})")
 
-
     # Placeholder method for creating a user
+
     def create_user(self, user_data):
-        #register user
+        # register user
         user = User(**user_data)
         self.user_repo.add(user)
 
         return user
 
-
     def delete_user(self, user_id):
         self.user_repo.delete(user_id)
-
 
     def update_user(self, user_id, user_data):
         self.user_repo.update(user_id, user_data)
         user = self.get_user(user_id)
 
         return user
-
 
     def get_user(self, user_id):
         user = self.user_repo.get(user_id)
@@ -64,7 +65,6 @@ class HBnBFacade:
 
         return user
 
-
     def get_user_by_email(self, email):
         user_email = self.user_repo.get_user_by_email(email)
 
@@ -72,7 +72,6 @@ class HBnBFacade:
             return None
 
         return user_email
-
 
     def get_all_users(self):
         all_users = self.user_repo.get_all()
@@ -82,42 +81,38 @@ class HBnBFacade:
 
         return all_users
 
-
     def create_place(self, owner_id, place_data):
         """Create a new place"""
         # Check if user id is in database
         user = self.user_repo.get(owner_id)
+
         if user is None:
             return None
-        #create place instance
-        place = Place(
-            place_data["title"], 
-            place_data["price"], 
-            place_data["latitude"], 
-            place_data["longitude"], 
-            user.id, 
-            place_data.get("description")
-        )
-       
-       # Add place to repository
+
+        # create place
+        place = Place(**place_data)
         self.place_repo.add(place)
 
         return place
-    
-    
+
     def update_place(self, place_id, place_data):
         """Update a place with new data"""
         place = self.place_repo.get(place_id)
+
         if not place:
             return None
+
         self.place_repo.update(place_id, place_data)
+
         return self.place_repo.get(place_id)
 
     def delete_place(self, place_id):
         """Delete a place by ID"""
         place = self.place_repo.get(place_id)
+
         if not place:
             return False
+
         self.place_repo.delete(place_id)
         return True
 
@@ -129,35 +124,34 @@ class HBnBFacade:
         """Get a specific place by ID"""
         return self.place_repo.get(place_id)
 
-
     def create_review(self, user_id, place_id, review_data):
         """validates user and place and creates new review"""
-        #check if user id is in database
+        # check if user id is in database
         user = self.user_repo.get(user_id)
 
         if user is None:
             raise UserNotFoundError
 
-        #check if place id is in database
+        # check if place id is in database
         place = self.place_repo.get(place_id)
 
         if place is None:
             raise PlaceNotFoundError
 
-        #get all reviews
+        # get all reviews
         reviews = self.review_repo.get_all()
 
-        #filter through the list of reviews, append reviews to place_reviews list
+        # filter through the list of reviews, append reviews to place_reviews list
         for val in reviews:
             if val.place_id == place_id and val.user_id == user_id:
                 raise ReviewAlreadyExistsError
 
-        review = Review(review_data["text"], review_data["rating"], place.id, user.id)
-        #Add review to database
+        review = Review(review_data["text"],
+                        review_data["rating"], place.id, user.id)
+        # Add review to database
         self.review_repo.add(review)
 
         return review
-
 
     def get_review(self, review_id):
         """Fetches review, returns None if no matching review"""
@@ -168,7 +162,6 @@ class HBnBFacade:
 
         return review
 
-
     def get_all_reviews(self):
         """Fetches all reviews, returns None if no reviews or list of reviews"""
         reviews = self.review_repo.get_all()
@@ -178,23 +171,21 @@ class HBnBFacade:
 
         return reviews
 
-
     def get_reviews_by_place(self, place_id):
         """
         Fetches all reviews and filters by place_id
         Returns empty list if no reviews or list of reviews
         """
-        #get all reviews
+        # get all reviews
         reviews = self.review_repo.get_all()
         place_reviews = []
 
-        #filter through the list of reviews, append reviews to place_reviews list
+        # filter through the list of reviews, append reviews to place_reviews list
         for val in reviews:
             if val.place_id == place_id:
                 place_reviews.append(val)
 
         return place_reviews
-
 
     def update_review(self, review_id, review_data):
         """
@@ -218,7 +209,6 @@ class HBnBFacade:
 
         return updated_review
 
-
     def delete_review(self, review_id):
         """
         Fetches review- if no review returns None
@@ -230,7 +220,6 @@ class HBnBFacade:
             raise ReviewNotFoundError
 
         self.review_repo.delete(review_id)
-
 
     def create_amenity(self, amenity_data):
         if not amenity_data.get("name"):
@@ -256,8 +245,8 @@ class HBnBFacade:
                 if not value or not value.strip():
                     return None
             setattr(amenity, key, value)
-        
-        return amenity        
+
+        return amenity
 
     def delete_amenity(self, amenity_id):
         amenity = self.get_amenity(amenity_id)
@@ -267,5 +256,6 @@ class HBnBFacade:
         self.amenity_repo.delete(amenity_id)
 
         return amenity
+
 
 facade = HBnBFacade()

@@ -1,6 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from werkzeug.wrappers import response
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from part3.app.services import facade
 from part3.app.utils.errors.place_errors import PlaceNotFoundError
 from part3.app.utils.errors.review_errors import ReviewAlreadyExistsError, ReviewInvalidDataError, ReviewNotFoundError
@@ -16,31 +15,34 @@ review_model = api.model('Review', {
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
     'place_id': fields.String(required=True, description='ID of the place')
 })
+
+
 @api.route('/setup_mock')
 class Mock(Resource):
     def get(self):
         user = {
             "first_name": "John",
             "last_name": "Smith",
-            "email": "johnsmith@gmail.com",
-            "password": "123"
+            "email": "johnsmithadmin@gmail.com",
+            "password": "123",
         }
         user = facade.create_user(user)
 
-        place = {
-            "title": "Cozy Apartment",
-            "description": "A nice place to stay",
-            "price": 100.0,
-            "latitude": 37.7749,
-            "longitude": -122.4194,
-            "owner_id": user.id
-        }
-
-        place = facade.create_place(user.id, place)
+        # place = {
+        #     "title": "Cozy Apartment",
+        #     "description": "A nice place to stay",
+        #     "price": 100.0,
+        #     "latitude": 37.7749,
+        #     "longitude": -122.4194
+        # }
+        # print("setting up place")
+        #
+        # place = facade.create_place(user.id, place)
         return {
             "user_id": user.id,
-            "place_id": place.id
+            # "place_id": place.id
         }, 200
+
 
 @api.route('/restart_db')
 class MockRestart(Resource):
@@ -58,6 +60,21 @@ class MockRestart(Resource):
             db.create_all()
 
 
+@api.route('/elevate_admin')
+class MockAdmin(Resource):
+    @jwt_required()
+    def get(self):
+        current_user_id = get_jwt_identity()
+        facade.update_user(current_user_id, {"is_admin": True})
+        access_token = create_access_token(
+            identity=str(current_user_id),   # only user ID goes here
+            additional_claims={"is_admin": True}  # extra info here
+        )
+
+        # Step 4: Return the JWT token to the client
+        return {'access_token': access_token}, 200
+
+
 @api.route('/')
 class ReviewList(Resource):
     @api.expect(review_model)
@@ -73,26 +90,28 @@ class ReviewList(Resource):
 
         review_data = api.payload
 
-           # Set user_id from JWT token
+        # Set user_id from JWT token
         review_data['user_id'] = current_user_id
 
         try:
             # Check if place exists and get place details
-            place = facade.place_repo.get(review_data['place_id'])
+            place = facade.get_place(review_data['place_id'])
             if not place:
                 return {"error": "Invalid input data", "message": "Place not found"}, 400
 
             # Check if user is trying to review their own place
-            if place.owner == current_user_id:
+            if place.owner_id == current_user_id:
                 return {"error": "You cannot review your own place."}, 400
 
             # Check if user has already reviewed this place
-            existing_reviews = facade.get_reviews_by_place(review_data['place_id'])
+            existing_reviews = facade.get_reviews_by_place(
+                review_data['place_id'])
             for review in existing_reviews:
                 if review.user_id == current_user_id:
                     return {"error": "You have already reviewed this place."}, 400
 
-            new_review = facade.create_review(review_data["user_id"], review_data["place_id"], review_data)
+            new_review = facade.create_review(
+                review_data["user_id"], review_data["place_id"], review_data)
         except UserNotFoundError as e:
             return {"error": "Invalid input data", "message": str(e)}, 400
         except PlaceNotFoundError as e:
@@ -107,13 +126,13 @@ class ReviewList(Resource):
         data = new_review.to_json()
         return data, 201
 
-
     @api.response(200, 'List of reviews retrieved successfully')
     def get(self):
         """Retrieve a list of all reviews"""
         reviews = facade.get_all_reviews()
         data = [review.to_json_id_text_rating() for review in reviews]
         return data, 200
+
 
 @api.route('/<review_id>')
 class ReviewResource(Resource):
@@ -127,7 +146,6 @@ class ReviewResource(Resource):
             return json_fetched_review, 200
         except ReviewNotFoundError:
             return {"error": "Review not found"}, 404
-
 
     @api.expect(review_model)
     @api.response(200, 'Review updated successfully')
@@ -165,9 +183,8 @@ class ReviewResource(Resource):
             return {"error": "Invalid input data", "message": str(e)}, 400
         except ReviewNotFoundError:
             return {"error": "Review not found"}, 404
-        except ReviewInvalidDataError:
+        except ReviewInvalidDataError as e:
             return {"error": "Invalid input data", "message": str(e)}, 400
-
 
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')

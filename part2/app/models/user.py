@@ -1,8 +1,10 @@
 from email_validator import validate_email, EmailNotValidError
 from app.models.base_model import BaseModel
 
+
 class User(BaseModel):
     """"User model"""
+
     def __init__(self, first_name, last_name, email, is_admin=False):
         super().__init__()
 
@@ -23,12 +25,12 @@ class User(BaseModel):
             raise ValueError("First Name is required")
         if len(value) > 50:
             raise ValueError(
-            "First Name length must be "
-            "less than or equal to 50 characters")
+                "First Name length must be "
+                "less than or equal to 50 characters")
         if not isinstance(value, str):
             raise TypeError("First Name must be a string")
         self.__first_name = value
- 
+
     """Get Value for last name"""
     @property
     def last_name(self):
@@ -41,8 +43,8 @@ class User(BaseModel):
             raise ValueError("Last Name is required")
         if len(value) > 50:
             raise ValueError(
-            "Last Name length must be "
-            "less than or equal to 50 characters")
+                "Last Name length must be "
+                "less than or equal to 50 characters")
         if not isinstance(value, str):
             raise TypeError("Last Name must be a string")
         self.__last_name = value
@@ -51,7 +53,7 @@ class User(BaseModel):
     @property
     def email(self):
         return self.__email
- 
+
     """Set value for email"""
     @email.setter
     def email(self, value):
@@ -59,8 +61,9 @@ class User(BaseModel):
             email_info = validate_email(value, check_deliverability=False)
             self.__email = email_info.normalized
         except EmailNotValidError:
-            raise EmailNotValidError("User email must be a valid email address")
- 
+            raise EmailNotValidError(
+                "User email must be a valid email address")
+
     """Get value for admin"""
     @property
     def is_admin(self):
@@ -70,7 +73,7 @@ class User(BaseModel):
     @is_admin.setter
     def is_admin(self, value):
         if not isinstance(value, bool):
-            print("issue with",value)
+            print("issue with", value)
             print(isinstance(value, bool))
             raise TypeError("is_admin must be true or false")
         self.__is_admin = value

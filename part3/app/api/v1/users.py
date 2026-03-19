@@ -38,14 +38,13 @@ class UserList(Resource):
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
- 
+
         try:
             new_user = facade.create_user(user_data)
         except EmailNotValidError:
             return {'error': 'User email must be a valid email'}, 400
 
         return {'id': new_user.id, 'message': 'User created successfully'}, 201
-
 
     @api.response(200, 'Users retrieved successfully')
     def get(self):
@@ -57,7 +56,8 @@ class UserList(Resource):
                 'id': user.id,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-                'email': user.email
+                'email': user.email,
+                'is_admin': user.is_admin
             }
             for user in users
         ], 200
@@ -73,7 +73,6 @@ class UserResource(Resource):
         if not user:
             return {'error': 'User not found'}, 404
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
- 
 
     @api.expect(user_update_model, validate=False)
     @api.response(200, 'User successfully updated')
@@ -90,35 +89,30 @@ class UserResource(Resource):
 
         # Set is_admin default to False if not exists
         is_admin = claims.get('is_admin', False)
- 
+
         # Check if the current user or an admin is trying to update user information
         if not is_admin and current_user_id != user_id:
             return {'error': 'Unauthorized action.'}, 403
- 
-        user_data = api.payload
 
-        print("Got user data ", user_data)
+        user_data = api.payload
 
         # Check if user is trying to modify email or password (not allowed)
         if 'email' in user_data or 'password' in user_data:
             return {'error': 'You cannot modify email or password.'}, 400
- 
+
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
 
-        print("Got user ", user)
-
         updated_user = facade.update_user(user_id, user_data)
-
-        print("Updated user ", updated_user)
-
-        return {
-            'id': updated_user.id,
-            'first_name': updated_user.first_name,
-            'last_name': updated_user.last_name,
-            'email': updated_user.email
-        }, 200
+        if updated_user:
+            return {
+                'id': updated_user.id,
+                'first_name': updated_user.first_name,
+                'last_name': updated_user.last_name,
+                'email': updated_user.email
+            }, 200
+        return {'error': 'internal server error'}, 500
 
     @api.response(200, 'User deleted successfully')
     @api.response(403, 'Unauthorized action')
@@ -141,7 +135,6 @@ class UserResource(Resource):
             return {"message": "User deleted successfully"}, 200
         except UserNotFoundError:
             return {"error": "User not found"}, 404
-
 
 
 @api.route('/email/<string:email>')
