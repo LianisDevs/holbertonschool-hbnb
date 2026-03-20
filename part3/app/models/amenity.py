@@ -8,6 +8,8 @@ class Amenity(BaseModel):
     __tablename__ = 'amenities'
 
     name = db.Column(db.String(100), nullable=False)
+   # Many-to-many: Amenity belongs to many Places
+    # the backref on Place.amenities already creates amenity.places,
 
 
     def __init__(self, name):

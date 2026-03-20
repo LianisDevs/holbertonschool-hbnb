@@ -121,7 +121,7 @@ class AmenityResource(Resource):
             if not amenity:
                 return {'error': 'Amenity not found'}, 404
 
-            if not is_admin and amenity.owner_id != current_user_id:
+            if not is_admin:
                 return {'error': 'Unauthorized action'}, 403
 
             success = facade.delete_amenity(amenity_id)

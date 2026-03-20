@@ -10,10 +10,12 @@ class Review(BaseModel):
 
     Parameters: inherits BaseModel
     """
+    
     text = db.Column(String(1000), nullable=False)
     rating = db.Column(Integer, nullable=False)
-    place_id = db.Column(String(36), nullable=False)
-    user_id = db.Column(String(36), default=False)
+    # Foreign keys
+    place_id = db.Column(String(36), db.ForeignKey('places.id'), nullable=False)
+    user_id = db.Column(String(36), db.ForeignKey('users.id'), nullable=False)
 
     def __init__(self, text, rating, place_id, user_id):
         super().__init__()

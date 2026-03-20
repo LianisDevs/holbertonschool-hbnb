@@ -109,20 +109,20 @@ class PlaceList(Resource):
                 } if owner else None
 
                 # Get amenities details
-                # amenities_data = []
-                # for amenity in place.amenities:
-                #     amenities_data.append({
-                #         'id': amenity.id,
-                #         'name': amenity.name
-                #     })
-
+                amenities_data = []
+                for amenity in place.amenities:
+                    amenities_data.append({
+                        'id': amenity.id,
+                        'name': amenity.name
+                    })
+                
                 place_data = {
                     'id': place.id,
                     'title': place.title,
                     'description': place.description,
                     'owner': owner_data,
                     'price': float(place.price),
-                    'amenities': "NEED TO IMPLEMENT",
+                    'amenities': amenities_data,
                     'created_at': place.created_at.isoformat(),
                     'updated_at': place.updated_at.isoformat()
                 }
@@ -155,12 +155,12 @@ class PlaceResource(Resource):
             } if owner else None
 
             # Get amenities details
-            # amenities_data = []
-            # for amenity in place.amenities:
-            #     amenities_data.append({
-            #         'id': amenity.id,
-            #         'name': amenity.name
-            #     })
+            amenities_data = []
+            for amenity in place.amenities:
+                amenities_data.append({
+                    'id': amenity.id,
+                    'name': amenity.name
+                })
 
             place_data = {
                 'id': place.id,
@@ -170,7 +170,7 @@ class PlaceResource(Resource):
                 'latitude': place.latitude,
                 'longitude': place.longitude,
                 'owner': owner_data,
-                'amenities': 'TO IMPLEMENT',
+                'amenities': amenities_data,
                 'created_at': place.created_at.isoformat(),
                 'updated_at': place.updated_at.isoformat()
             }
@@ -225,6 +225,10 @@ class PlaceResource(Resource):
 
             # Get updated place
             updated_place = facade.get_place(place_id)
+            
+            amenities_data = []
+            for amenity in updated_place.amenities:
+                amenities_data.append({'id': amenity.id, 'name': amenity.name})
 
             return {
                 'id': updated_place.id,
@@ -234,7 +238,7 @@ class PlaceResource(Resource):
                 'latitude': updated_place.latitude,
                 'longitude': updated_place.longitude,
                 'owner_id': updated_place.owner_id,
-                'amenities': "TO BE IMPLEMENTED",
+                'amenities': amenities_data,
                 'created_at': updated_place.created_at.isoformat(),
                 'updated_at': updated_place.updated_at.isoformat()
             }, 200

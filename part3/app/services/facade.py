@@ -250,11 +250,10 @@ class HBnBFacade:
     def delete_amenity(self, amenity_id):
         amenity = self.get_amenity(amenity_id)
         if not amenity:
-            return None
+            return False
 
         self.amenity_repo.delete(amenity_id)
-
-        return amenity
+        return True
 
 
 facade = HBnBFacade()
