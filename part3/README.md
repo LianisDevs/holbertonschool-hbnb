@@ -978,6 +978,29 @@ curl -X PUT http://127.0.0.1:5000/api/v1/amenities/1 \
 ```
 It is important that you change the "1" ID as this is how you specify which amenity is being changed
 
+#### DELETE AMENITY
+
+To delete an amenity, use the amenity ID together with a valid JWT token. This endpoint requires authentication, and the user must be an admin or the owner of the amenity.
+```bash
+curl -X DELETE http://127.0.0.1:5000/api/v1/amenities/YOUR_AMENITY_ID_HERE \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
+```
+**Expected Output**
+```jsonc
+{
+  "message": "Amenity deleted successfully"
+}
+```
+
+If the amenity does not exist, the API will return:
+```jsonc
+{
+  "error": "Amenity not found"
+}
+```
+
+If the JWT token is missing or the user is not allowed to delete the amenity, the API will return an authentication or authorization error.
+
 # Tests
 This application has been tested using pytest. To run the tests created:
 ```bash

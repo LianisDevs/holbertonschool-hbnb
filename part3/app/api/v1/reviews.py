@@ -48,7 +48,7 @@ class Mock(Resource):
 class MockRestart(Resource):
     def delete(self):
         from run import get_app
-        database_path = '/Users/uliana.deshin/hbnb/holbertonschool-hbnb/instance/development.db'
+        database_path = '/Users/moyea/holbertonschool-hbnb/instance/development.db'
 
         if os.path.exists(database_path):
             os.remove(database_path)
