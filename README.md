@@ -6,41 +6,40 @@ This Repository contains the files for the HBNB project. HBNB replicates the bas
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
-	- [User](#user)
-	- [Place](#place)
-	- [Review](#review)
-	- [Ammenity](#ammenity)
+  - [User](#user)
+  - [Place](#place)
+  - [Review](#review)
+  - [Ammenity](#ammenity)
 - [Tests](#tests)
 - [Files](#files)
 - [Authors](#authors)
 
 # Features
 CRUD capabilites for User/ Place/ Review/ Ammenities 
-(please note User cannot delete in this version this will be implemented in a future version)
 
 # Requirements
 This project requires Python version 3.14 or later. To check what version of Python you have installed use the command below:
 ```bash
-> python --version
+python --version
 ```
 # Installation
 1. Clone the repository locally
 ```bash
-> git clone https://github.com/LianisDevs/holbertonschool-hbnb
+git clone https://github.com/LianisDevs/holbertonschool-hbnb
 ```
 2. Navigate to this directory
 ```bash
-> cd holbertonschool-hbnb
+cd holbertonschool-hbnb
 ```
 3. Install the dependencies using
 ```bash
-> pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 # Usage
 Run the application from the holbertonschool-hbnb directory
 ```bash
-> python3 run.py
+python3 run.py
 ```
 Use tools like Postman or cURL to use the API endpoints, below examples use curl:
 
@@ -53,7 +52,8 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
   -d '{
     "first_name": "John",
     "last_name": "Smith",
-    "email": "john.smith@example.com"
+    "email": "john.smith@example.com",
+    "password": "ilikecats"
   }'
 ```
 
@@ -69,6 +69,39 @@ curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
 
 // 201 Created
 ```
+#### Testing User Login 
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{
+  "email": "john.doe@example.com",
+  "password": "your_password"
+}'
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "access_token": "your_generated_jwt_token"
+}
+
+// 200 ok
+```
+
+#### Testing User Authorization
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/protected" -H "Authorization: Bearer your_generated_jwt_token"
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "message": "Hello, user 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+
+// 200 ok
+```
+
 #### Testing Email Already Registered
 First create a user, then attempt to register again with the same email.
 
@@ -236,17 +269,54 @@ curl -X GET "http://127.0.0.1:5000/api/v1/users/email/john.smithle.com"
 // 404 Not Found
 ```
 
+### GET PLACES BY USER
+Testing Get Places by User
+Replace <user_id> with your own user ID and use your JWT token:
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/users/YOUR_USER_ID_HERE/places"
+```
+**Expected Response**
+
+```jsonc
+
+  "places": [
+    {
+      "id": "38e80995-e208-4cdf-ac6a-359e1bcd52e1",
+      "title": "Cozy Apartment",
+      "description": "A nice place to stay",
+      "price": 100.0,
+      "latitude": "37.7749",
+      "longitude": "-122.4194",
+      "amenities": [
+        "SHARKS"
+      ],
+      "reviews": [
+        {
+          "text": "Such a lovely stay!",
+          "rating": 5
+        }
+      ],
+      "created_at": "2026-03-22T06:35:28.380720",
+      "updated_at": "2026-03-22T06:35:28.380725"
+    }
+  ]
+}
+```
+
 ### UPDATE USER
+
+Updating user information requires JWT authentication. Users can only update their own information and cannot modify email or password fields.
+
 #### Testing Update a User — Success
 
-Replace <user_id> with a valid user ID returned from a previous creation request.
+Replace <user_id> with your own user ID and use your JWT token:
 ```bash
-curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6f016" \
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/YOUR_USER_ID_HERE" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
   -d '{
-    "first_name": "Jonathan",
-    "last_name": "Smith",
-    "email": "jonathan.smith@example.com"
+    "first_name": "Updated Name",
+    "last_name": "Smith"
   }'
 ```
 
@@ -255,22 +325,86 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6
 ```jsonc
 {
     "id": "00b803c9-c44a-47d1-b0f2-889528a6f016",
-    "first_name": "Jonathan",
+    "first_name": "Updated Name",
     "last_name": "Smith",
-    "email": "jonathan.smith@example.com"
+    "email": "john.smith@example.com"
 }
 
 // 200 OK
+```
+
+#### Testing Update User — Forbidden Fields
+Attempting to modify email or password:
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/YOUR_USER_ID_HERE" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+  -d '{
+    "first_name": "Updated Name",
+    "email": "newemail@example.com",
+    "password": "newpassword"
+  }'
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "error": "You cannot modify email or password."
+}
+
+// 400 Bad Request
+```
+
+#### Testing Update User — Unauthorized
+Attempting to update another user's information:
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/SOMEONE_ELSES_USER_ID" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+  -d '{
+    "first_name": "Hacked Name"
+  }'
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "error": "Unauthorized action."
+}
+
+// 403 Forbidden
+```
+
+#### Testing Update User — No Authentication
+Attempting to update user information without JWT token:
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/YOUR_USER_ID_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "No Auth Update"
+  }'
+```
+
+**Expected Response**
+
+```jsonc
+{
+    "msg": "Missing Authorization Header"
+}
+
+// 401 Unauthorized
 ```
 
 #### Testing Update a User — User Not Found
 ```bash
 curl -X PUT "http://127.0.0.1:5000/api/v1/users/nonexistent-id-999" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
   -d '{
     "first_name": "Ghost",
-    "last_name": "User",
-    "email": "ghost@example.com"
+    "last_name": "User"
   }'
 ```
 
@@ -288,8 +422,9 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/nonexistent-id-999" \
 Only fields provided in the body will be updated. Fields omitted keep their existing values.
 
 ```bash
-curl -X PUT "http://127.0.0.1:5000/api/v1/users/00b803c9-c44a-47d1-b0f2-889528a6f016" \
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/YOUR_USER_ID_HERE" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
   -d '{
     "first_name": "Johnny"
   }'
@@ -314,43 +449,103 @@ To create a Place using the JSON format, you can use the below example. Fill in 
 
 Requirements: 
 - Title must be a string equal to or below 100 chars
-- Description is optional, and must be a string if added
-- Price must be a positive integer
-- Latitude must be between 90 and -90
-- Longitude must be between 180 and -180
-- Owner_id must be pre-existing and valid (this can be achieved by creating a user beforehand and copying its provided UUID)
-- Any amenities added must be valid (achieve this by completing the 'Create Amenity' instructions below).
+- Description is optional, and must be a string if added  
+- Price must be a positive number
+- Latitude must be between -90 and 90
+- Longitude must be between -180 and 180
+- Any amenities added must be valid (create amenities first using the Amenity section)
 
-Use the curl command below:
+Prerequisites
+Before completing these tests, ensure you have:
+1. Created a user account (see User section)
+2. Logged in to get a JWT token (see User Login section) 
+3. Created at least one amenity (see Amenity section)
+
+First, create a user and log in to get your JWT token:
+
 ```bash
-curl -X POST http://127.0.0.1:5000/api/v1/places/ \
+# 1. Create a user
+curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
   -H "Content-Type: application/json" \
   -d '{
+    "first_name": "Test",
+    "last_name": "User", 
+    "email": "testuser@example.com",
+    "password": "password123"
+  }'
+
+# 2. Login to get JWT token
+curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "testuser@example.com",
+    "password": "password123"
+  }'
+
+# 3. Create an amenity (needed for places)
+curl -X POST "http://127.0.0.1:5000/api/v1/amenities/" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "WiFi"}'
+```
+
+# Testing Authenticated Place Creation
+**Note:** The `owner_id` is automatically set from your JWT token and should NOT be included in the request body.
+
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/places/" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+  -d '{
     "title": "Fantabulous Cottage in the Woods",
-    "description": "A super cute cottage where you can live out your fairytale dreams!",	
+    "description": "A super cute cottage where you can live out your fairytale dreams!",
     "price": 250.00,
     "latitude": 36.7489,
     "longitude": -119.7722,
-    "owner_id": "YOUR_ACTUAL_USER_ID_HERE",
-    "amenities": ["YOUR_ACTUAL_WIFI_ID_HERE", "YOUR_ACTUAL_POOL_ID_HERE"]
+    "amenities": ["YOUR_AMENITY_ID_HERE"]
   }'
-  ```
-  **Expected Response:**
+```
+
+**Expected Response:**
 ```jsonc
 {
-  "id": "cottage789",
-  "title": "Fantabulous Cottage in the Woods",
+  "id": "19d8e3bd-f3b2-4e82-97b6-2eae5324f176",
+  "title": "Fantabulous Cottage in the Woods", 
   "description": "A super cute cottage where you can live out your fairytale dreams!",
   "price": 250.0,
   "latitude": 36.7489,
   "longitude": -119.7722,
-  "owner_id": "kittycat500",
-  "amenities": ["wifi123", "pool456"],
-  "created_at": "2026-03-03T10:30:00.123456",
-  "updated_at": "2026-03-03T10:30:00.123456"
+  "owner_id": "7ddbcbe2-aed4-4fb4-a470-76077d1917bc",
+  "amenities": ["da3d8ad9-ce41-4efc-9d0b-bf27d948e21a"],
+  "reviews": [],
+  "created_at": "2026-03-13T15:43:16.943669",
+  "updated_at": "2026-03-13T15:43:16.943676"
 }
 
 // 201 Created
+```
+
+# Testing Unauthorized Place Creation
+Attempting to create a place without authentication:
+
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/places/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Unauthorized Place",
+    "price": 100.0,
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "amenities": ["YOUR_AMENITY_ID_HERE"]
+  }'
+```
+
+**Expected Response:**
+```jsonc
+{
+  "msg": "Missing Authorization Header"
+}
+
+// 401 Unauthorized
 ```
 #### GET ALL PLACES
 Get all places as a list with this curl command: 
@@ -379,6 +574,12 @@ curl -X GET http://127.0.0.1:5000/api/v1/places/
         "name": "WiFi"
       }
     ],
+  "reviews": [
+  {
+    "text": "Such a lovely stay!",
+    "rating": 5
+  }
+  ],
     "created_at": "2026-03-03T10:30:00.123456",
     "updated_at": "2026-03-03T10:30:00.123456"
   }
@@ -413,6 +614,12 @@ curl -X GET http://127.0.0.1:5000/api/v1/places/cottage789
       "name": "WiFi"
     }
   ],
+  "reviews": [
+    {
+      "text": "Such a lovely stay!",
+      "rating": 5
+    }
+  ],
   "created_at": "2026-03-03T10:30:00.123456",
   "updated_at": "2026-03-03T10:30:00.123456"
 }
@@ -420,69 +627,159 @@ curl -X GET http://127.0.0.1:5000/api/v1/places/cottage789
 // 200 OK
 ```
 #### UPDATE PLACE
-Update an existing place with the fields that require change.
+Only the owner of a place can update it. You must include the JWT token of the place owner.
+
+Update an existing place with the fields that require change:
 ```bash
-curl -X PUT http://127.0.0.1:5000/api/v1/places/cottage789 \
+curl -X PUT "http://127.0.0.1:5000/api/v1/places/YOUR_PLACE_ID_HERE" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
   -d '{
     "title": "Updated Beach House",
     "description": "Newly renovated oceanfront property",
     "price": 300.00
   }'
 ```
+
 **Expected Response:**
 ```jsonc
 {
-  "id": "cottage789",
+  "id": "19d8e3bd-f3b2-4e82-97b6-2eae5324f176",
   "title": "Updated Beach House",
   "description": "Newly renovated oceanfront property",
   "price": 300.0,
   "latitude": 36.7489,
   "longitude": -119.7722,
-  "owner_id": "kittycat500",
-  "amenities": ["wifi123"],
-  "created_at": "2026-03-03T10:30:00.123456",
-  "updated_at": "2026-03-03T11:45:00.123456"
+  "owner_id": "7ddbcbe2-aed4-4fb4-a470-76077d1917bc",
+  "amenities": ["da3d8ad9-ce41-4efc-9d0b-bf27d948e21a"],
+  "created_at": "2026-03-13T15:43:16.943669",
+  "updated_at": "2026-03-13T15:44:13.444682"
 }
 
 // 200 OK
 ```
-## Review
-#### CREATE A REVIEW
-To create a review you need a valid user_id and place_id, make sure you replace the user_id and place_id in the curl command:
+
+#### Testing Unauthorized Place Update
+Attempting to update someone else's place with your JWT token:
+
 ```bash
-curl -X POST http://127.0.0.1:5000/api/v1/reviews/ \
+curl -X PUT "http://127.0.0.1:5000/api/v1/places/SOMEONE_ELSES_PLACE_ID" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+  -d '{
+    "title": "Hacked Title"
+  }'
+```
+
+**Expected Response (Unauthorized Update):**
+```jsonc
+{
+  "error": "Unauthorized action"
+}
+
+// 403 Forbidden  
+```
+
+#### Testing Place Update Without Authentication
+Attempting to update a place without providing a JWT token:
+
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/places/YOUR_PLACE_ID_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "No Auth Update"
+  }'
+```
+
+**Expected Response:**
+```jsonc
+{
+  "msg": "Missing Authorization Header"
+}
+
+// 401 Unauthorized
+```
+## Review
+
+Creating, updating, and deleting reviews requires JWT authentication. The user_id is automatically set from the JWT token and should not be included in the request body.
+
+#### CREATE A REVIEW
+To create a review you need a valid place_id and JWT token. The user_id is automatically set from your authentication token:
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/reviews/" \
      -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
      -d '{
-		"text": "Dream stay, can't wait to go back!",
-		"rating": 5, "user_id": <add user_id>,
-		"place_id": <add place_id>
-		}'
+    "text": "Dream stay, can't wait to go back!",
+    "rating": 5,
+    "place_id": "YOUR_PLACE_ID_HERE"
+    }'
 ```
 Expected response valid data:
 ```jsonc
 {
-  "id": "<review_id>",
+  "id": "03bc36fd-fc43-4c51-a08b-eca82c5fe9fd",
   "text": "Great place to stay!",
   "rating": 5,
-  "user_id": "<user_id",
-  "place_id": "<place_id>"
+  "user_id": "df2e423b-9110-4c5c-b867-46f02c4640f9",
+  "place_id": "19d8e3bd-f3b2-4e82-97b6-2eae5324f176"
 }
 
 // 201 Created
 ```
-Expected response invalid data:
+
+#### Testing Review Creation
+Trying to review your own place:
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/reviews/" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer PLACE_OWNER_JWT_TOKEN" \
+     -d '{
+    "text": "Reviewing my own place",
+    "rating": 5,
+    "place_id": "YOUR_OWN_PLACE_ID"
+    }'
+```
+Expected response:
 ```jsonc
-"Invalid input data"
+{
+  "error": "You cannot review your own place."
+}
 
 // 400 Bad Request
 ```
-#### UPDATE REVIEW
-To update a review you need a valid review_id, make sure you replace the review_id in the curl command:
+
+#### Testing Unauthorized Review Creation
+Attempting to create a review without authentication:
 ```bash
-curl -X PUT http://127.0.0.1:5000/api/v1/reviews/<review_id> \
+curl -X POST "http://127.0.0.1:5000/api/v1/reviews/" \
      -H "Content-Type: application/json" \
-     -d '{"text": "Horrible stay, ", "rating": 1}'
+     -d '{
+    "text": "Unauthorized review",
+    "rating": 5,
+    "place_id": "SOME_PLACE_ID"
+    }'
+```
+Expected response:
+```jsonc
+{
+  "msg": "Missing Authorization Header"
+}
+
+// 401 Unauthorized
+```
+#### UPDATE REVIEW
+Only the review author can update their own review.
+
+To update a review you need a valid review_id and JWT token from the review author:
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/reviews/YOUR_REVIEW_ID_HERE" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+     -d '{
+         "text": "Horrible stay", 
+         "rating": 1
+     }'
 ```
 Expected response valid data:
 ```jsonc
@@ -492,17 +789,42 @@ Expected response valid data:
 
 // 200 OK
 ```
-Expected response invalid review_id:
-```jsonc
-"Review not found"
 
-// 404 Not found
+#### Testing Unauthorized Review Update
+Attempting to update someone else's review:
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/reviews/SOMEONE_ELSES_REVIEW_ID" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+     -d '{
+         "text": "Hacked review"
+     }'
 ```
-Expected response invalid review data:
+Expected response:
 ```jsonc
-"Invalid input data"
+{
+  "error": "Unauthorized action."
+}
 
-// 400 Bad request
+// 403 Forbidden
+```
+
+#### Testing Review Update Without Authentication
+Attempting to update a review without JWT token:
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/reviews/SOME_REVIEW_ID" \
+     -H "Content-Type: application/json" \
+     -d '{
+         "text": "No auth update"
+     }'
+```
+Expected response:
+```jsonc
+{
+  "msg": "Missing Authorization Header"
+}
+
+// 401 Unauthorized
 ```
 
 #### GET REVIEW BY ID
@@ -580,9 +902,12 @@ Expected response if no reviews in memory:
 // 200 OK
 ```
 #### DELETE REVIEW
-To delete a review you need a valid review_id, make sure you replace the review_id in the curl command:
+Only the review author can delete their own review.
+
+To delete a review you need a valid review_id and JWT token from the review author:
 ```bash
-curl -X DELETE http://127.0.0.1:5000/api/v1/reviews/<review_id>
+curl -X DELETE "http://127.0.0.1:5000/api/v1/reviews/YOUR_REVIEW_ID_HERE" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
 ```
 Expected response valid data:
 ```jsonc
@@ -592,11 +917,34 @@ Expected response valid data:
 
 // 200 OK
 ```
-Expected response invalid review_id:
-```jsonc
-"Review not found"
 
-// 404 Not found
+#### Testing Unauthorized Review Deletion
+Attempting to delete someone else's review:
+```bash
+curl -X DELETE "http://127.0.0.1:5000/api/v1/reviews/SOMEONE_ELSES_REVIEW_ID" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
+```
+Expected response:
+```jsonc
+{
+  "error": "Unauthorized action."
+}
+
+// 403 Forbidden
+```
+
+#### Testing Review Deletion Without Authentication
+Attempting to delete a review without JWT token:
+```bash
+curl -X DELETE "http://127.0.0.1:5000/api/v1/reviews/SOME_REVIEW_ID"
+```
+Expected response:
+```jsonc
+{
+  "msg": "Missing Authorization Header"
+}
+
+// 401 Unauthorized
 ```
 ## Ammenity
 #### CREATE AMENITY
@@ -676,81 +1024,28 @@ curl -X PUT http://127.0.0.1:5000/api/v1/amenities/1 \
 ```
 It is important that you change the "1" ID as this is how you specify which amenity is being changed
 
-## Test admin privileges
+#### DELETE AMENITY
 
-**When site is run, log in to admin account using the following command. output will show a token to use for following commands**
+To delete an amenity, use the amenity ID together with a valid JWT token. This endpoint requires authentication, and the user must be an admin or the owner of the amenity.
 ```bash
-curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" \
-     -H "Content-Type: application/json" \
-     -d '{"email": "admin@hbnb.com", "password": "password123"}'
+curl -X DELETE http://127.0.0.1:5000/api/v1/amenities/YOUR_AMENITY_ID_HERE \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
 ```
-
-### Test creating new admin user
-
-```bash
-curl -X POST "http://127.0.0.1:5000/api/v1/users/" -d '{"email": "newuser@example.com", "first_name": "Admin", "last_name": "User", "password": "123"}' -H "Authorization: Bearer <admin_token>" -H "Content-Type: application/json"
-```
-
 **Expected Output**
 ```jsonc
 {
-    "id": "490a6259-9e6d-4417-b4a9-01313b02a5f5",
-    "message": "User created successfully"
+  "message": "Amenity deleted successfully"
 }
 ```
 
-### Test Updating a user
-
-```bash
-curl -X PUT "http://127.0.0.1:5000/api/v1/users/<user_id>" \
--H "Authorization: Bearer <admin_token>" \
--H "Content-Type: application/json" \
--d '{"first_name": "Sandy"}'
-```
-
-**Expected Output**
-
+If the amenity does not exist, the API will return:
 ```jsonc
 {
-    "id": "490a6259-9e6d-4417-b4a9-01313b02a5f5",
-    "first_name": "Sandy",
-    "last_name": "User",
-    "email": "newuser@example.com"
+  "error": "Amenity not found"
 }
 ```
 
-### Test Adding amenity
-
-```bash
-curl -X POST "http://127.0.0.1:5000/api/v1/amenities/" \
--H "Authorization: Bearer <admin_token" \
--H "Content-Type: application/json" \
--d '{"name": "Swimming Pool"}'
-```
-
-**Expected Output**
-
-```jsonc
-{
-    "id": "f115a718-7dc9-4e78-a3fe-07f4f93ff523",
-    "name": "Swimming Pool"
-}
-```
-
-### Test updating amenity
-
-```bash
-curl -X PUT "http://127.0.0.1:5000/api/v1/amenities/<amenity_id>" -d '{"name": "Updated Amenity"}' -H "Authorization: Bearer <admin_token>" -H "Content-Type: application/json"
-```
-
-**Expected Output**
-
-```jsonc
-{
-    "id": "f115a718-7dc9-4e78-a3fe-07f4f93ff523",
-    "name": "Updated Amenity"
-}
-```
+If the JWT token is missing or the user is not allowed to delete the amenity, the API will return an authentication or authorization error.
 
 # Tests
 This application has been tested using pytest. To run the tests created:
@@ -846,11 +1141,11 @@ hbnb/
 * The utils/ subdirectory houses the custom errors
     * __init__.py
     * errors/
-		* __init__.py
-		* review_errors.py
+    * __init__.py
+    * review_errors.py
 * config.py
     * This will be used for configuring enviornment variables and application settings
-	
+  
 * requirements.txt
     * This will list all the python packages needed for the project
 
