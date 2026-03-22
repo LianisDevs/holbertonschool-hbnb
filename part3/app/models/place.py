@@ -6,35 +6,38 @@ from sqlalchemy.orm import validates
 # Many-to-many association table for Place <-> Amenity
 place_amenity = db.Table(
     'place_amenity',
-    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
-    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
+    db.Column('place_id', db.String(36), db.ForeignKey(
+        'places.id'), primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey(
+        'amenities.id'), primary_key=True)
 )
+
 
 class Place(BaseModel):
     """Place model"""
     __tablename__ = 'places'
-
 
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(1000), nullable=False)
     price = db.Column(Float(), nullable=False)
     latitude = db.Column(String(20), nullable=False)
     longitude = db.Column(String(20), nullable=False)
-    
+
     # FOREIGN KEY
-    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    
+    owner_id = db.Column(db.String(36), db.ForeignKey(
+        'users.id'), nullable=False)
+
     # owner = db.relationship('User', backref='places', lazy=True)
     # Use relationship() in both models to link them.
-    
+
     # RELATIONSHIPS
     # One-to-many: Place has many Reviews
     reviews = db.relationship('Review', backref='place', lazy=True)
     # Many-to-many: Place <-> Amenity via association table
-    amenities = db.relationship('Amenity', secondary=place_amenity, lazy='subquery',backref=db.backref('places', lazy=True))
+    amenities = db.relationship('Amenity', secondary=place_amenity,
+                                lazy='subquery', backref=db.backref('places', lazy=True))
 
-
-    def __init__(self, title, price, latitude, longitude, owner_id, description=None):
+    def __init__(self, title, price, latitude, longitude, owner_id, amenities, description=None):
         super().__init__()
 
         self.title = title
@@ -43,6 +46,7 @@ class Place(BaseModel):
         self.latitude = latitude
         self.longitude = longitude
         self.owner_id = owner_id
+        self.amenities = amenities
 
     @validates("title")
     def validates_title(self, key, value):

@@ -98,7 +98,6 @@ class PlaceList(Resource):
             places_list = []
 
             for place in places:
-                print(place.owner_id)
                 # Get owner details
                 owner = facade.user_repo.get(place.owner_id)
                 owner_data = {
@@ -115,7 +114,7 @@ class PlaceList(Resource):
                         'id': amenity.id,
                         'name': amenity.name
                     })
-                
+
                 place_data = {
                     'id': place.id,
                     'title': place.title,
@@ -205,27 +204,12 @@ class PlaceResource(Resource):
 
             update_data = api.payload
 
-            # TODO: Implement once Amenities mapping is completed
-            # Validate amenities if provided
-            # if 'amenities' in update_data:
-            #     amenity_objects = []
-            #     for amenity_id in update_data['amenities']:
-            #         amenity = facade.amenity_repo.get(amenity_id)
-            #         if not amenity:
-            #             return {'error': f'Amenity with id {amenity_id} not found'}, 404
-            #         amenity_objects.append(amenity)
-            #
-            #     # Update amenities
-            #     place.amenities = amenity_objects
-            #     # Remove amenities from update data as it's handled separately
-            #     del update_data['amenities']
-
             # Update place using facade
             facade.update_place(place_id, update_data)
 
             # Get updated place
             updated_place = facade.get_place(place_id)
-            
+
             amenities_data = []
             for amenity in updated_place.amenities:
                 amenities_data.append({'id': amenity.id, 'name': amenity.name})

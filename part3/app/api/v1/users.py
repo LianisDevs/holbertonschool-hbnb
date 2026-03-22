@@ -161,3 +161,32 @@ class UserByEmail(Resource):
 #          # addtional claims = get_jwt()
 #          #additional claims["is_admin"] -> True or False
 #          return {'message': f'Hello, user {current_user}'}, 200
+
+@api.route('/<user_id>/places')
+class UserPlaces(Resource):
+    @api.response(200, 'User details retrieved successfully')
+    @api.response(404, 'User not found')
+    def get(self, user_id):
+        """Get a list of the users places"""
+        user = facade.get_user(user_id)
+        if not user:
+            return {'error': 'User not found'}, 404
+
+        return {'places': [
+            {
+                'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'price': place.price,
+                'latitude': place.latitude,
+                'longitude': place.longitude,
+                'amenities': [amenity.name for amenity in place.amenities],
+                'reviews': [{
+                    'text': review.text,
+                    'rating': review.rating
+                } for review in place.reviews],
+                'created_at': place.created_at.isoformat(),
+                'updated_at': place.updated_at.isoformat()
+            }
+            for place in user.places
+        ]}, 200

@@ -89,8 +89,11 @@ class HBnBFacade:
         if user is None:
             return None
 
+        amenities = [self.get_amenity(id) for id in place_data['amenities']]
+
         # create place
-        place = Place(**place_data)
+        place = Place(title=place_data['title'], price=place_data['price'], latitude=place_data['latitude'],
+                      longitude=place_data['longitude'], owner_id=owner_id, description=place_data['description'], amenities=amenities)
         self.place_repo.add(place)
 
         return place
@@ -243,7 +246,7 @@ class HBnBFacade:
         if "name" in amenity_data:
             if not amenity_data["name"] or not amenity_data["name"].strip():
                 return None
-    
+
         self.amenity_repo.update(amenity_id, amenity_data)
         return self.get_amenity(amenity_id)
 
