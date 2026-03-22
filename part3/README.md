@@ -16,31 +16,30 @@ This Repository contains the files for the HBNB project. HBNB replicates the bas
 
 # Features
 CRUD capabilites for User/ Place/ Review/ Ammenities 
-(please note User cannot delete in this version this will be implemented in a future version)
 
 # Requirements
 This project requires Python version 3.14 or later. To check what version of Python you have installed use the command below:
 ```bash
-> python --version
+python --version
 ```
 # Installation
 1. Clone the repository locally
 ```bash
-> git clone https://github.com/LianisDevs/holbertonschool-hbnb
+git clone https://github.com/LianisDevs/holbertonschool-hbnb
 ```
 2. Navigate to this directory
 ```bash
-> cd holbertonschool-hbnb
+cd holbertonschool-hbnb
 ```
 3. Install the dependencies using
 ```bash
-> pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 # Usage
 Run the application from the holbertonschool-hbnb directory
 ```bash
-> python3 run.py
+python3 run.py
 ```
 Use tools like Postman or cURL to use the API endpoints, below examples use curl:
 
