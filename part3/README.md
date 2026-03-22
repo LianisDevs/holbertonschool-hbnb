@@ -269,6 +269,40 @@ curl -X GET "http://127.0.0.1:5000/api/v1/users/email/john.smithle.com"
 // 404 Not Found
 ```
 
+### GET PLACES BY USER
+Testing Get Places by User
+Replace <user_id> with your own user ID and use your JWT token:
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/users/YOUR_USER_ID_HERE/places"
+```
+**Expected Response**
+
+```jsonc
+
+  "places": [
+    {
+      "id": "38e80995-e208-4cdf-ac6a-359e1bcd52e1",
+      "title": "Cozy Apartment",
+      "description": "A nice place to stay",
+      "price": 100.0,
+      "latitude": "37.7749",
+      "longitude": "-122.4194",
+      "amenities": [
+        "SHARKS"
+      ],
+      "reviews": [
+        {
+          "text": "Such a lovely stay!",
+          "rating": 5
+        }
+      ],
+      "created_at": "2026-03-22T06:35:28.380720",
+      "updated_at": "2026-03-22T06:35:28.380725"
+    }
+  ]
+}
+```
+
 ### UPDATE USER
 
 Updating user information requires JWT authentication. Users can only update their own information and cannot modify email or password fields.
@@ -482,6 +516,7 @@ curl -X POST "http://127.0.0.1:5000/api/v1/places/" \
   "longitude": -119.7722,
   "owner_id": "7ddbcbe2-aed4-4fb4-a470-76077d1917bc",
   "amenities": ["da3d8ad9-ce41-4efc-9d0b-bf27d948e21a"],
+  "reviews": [],
   "created_at": "2026-03-13T15:43:16.943669",
   "updated_at": "2026-03-13T15:43:16.943676"
 }
@@ -539,6 +574,12 @@ curl -X GET http://127.0.0.1:5000/api/v1/places/
         "name": "WiFi"
       }
     ],
+	"reviews": [
+	{
+		"text": "Such a lovely stay!",
+		"rating": 5
+	}
+	],
     "created_at": "2026-03-03T10:30:00.123456",
     "updated_at": "2026-03-03T10:30:00.123456"
   }
@@ -571,6 +612,12 @@ curl -X GET http://127.0.0.1:5000/api/v1/places/cottage789
     {
       "id": "wifi123",
       "name": "WiFi"
+    }
+  ],
+  "reviews": [
+    {
+      "text": "Such a lovely stay!",
+      "rating": 5
     }
   ],
   "created_at": "2026-03-03T10:30:00.123456",
