@@ -645,6 +645,7 @@ First, create a user and log in to get your JWT token:
 # 1. Create a user
 curl -X POST "http://127.0.0.1:5000/api/v1/users/" \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
   -d '{
     "first_name": "Test",
     "last_name": "User", 
