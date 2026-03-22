@@ -80,6 +80,7 @@ class PlaceList(Resource):
                 'longitude': place.longitude,
                 'owner_id': place.owner_id,
                 'amenities': [amenity.name for amenity in place.amenities],
+                'reviews': [],
                 'created_at': place.created_at.isoformat(),
                 'updated_at': place.updated_at.isoformat()
             }, 201
@@ -122,6 +123,10 @@ class PlaceList(Resource):
                     'owner': owner_data,
                     'price': float(place.price),
                     'amenities': amenities_data,
+                    'reviews': [{
+                        'text': review.text,
+                        'rating': review.rating
+                    } for review in place.reviews],
                     'created_at': place.created_at.isoformat(),
                     'updated_at': place.updated_at.isoformat()
                 }
@@ -170,6 +175,10 @@ class PlaceResource(Resource):
                 'longitude': place.longitude,
                 'owner': owner_data,
                 'amenities': amenities_data,
+                'reviews': [{
+                    'text': review.text,
+                    'rating': review.rating
+                } for review in place.reviews],
                 'created_at': place.created_at.isoformat(),
                 'updated_at': place.updated_at.isoformat()
             }
