@@ -102,3 +102,34 @@ class AmenityResource(Resource):
         if not updated_amenity:
             return {'error': 'Failed to update amenity'}, 400
         return {"id": updated_amenity.id, "name": updated_amenity.name}, 200
+    
+    @api.response(200, 'Amenity deleted successfully')
+    @api.response(404, 'Amenity not found')
+    @api.response(401, 'Authentication required')
+    @api.response(403, 'Unauthorized action')
+    @api.response(400, 'Failed to delete Amenity')
+    @jwt_required()
+    def delete(self, amenity_id):
+        """Delete an amenity"""
+        # Get current user from JWT token
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
+
+        try:
+            amenity = facade.get_amenity(amenity_id)
+            if not amenity:
+                return {'error': 'Amenity not found'}, 404
+
+            if not is_admin:
+                return {'error': 'Unauthorized action'}, 403
+
+            success = facade.delete_amenity(amenity_id)
+
+            if success:
+                return {'message': 'Amenity deleted successfully'}, 200
+            else:
+                return {'error': 'Failed to delete amenity'}, 400
+
+        except Exception:
+            return {'error': 'Internal server error'}, 500
