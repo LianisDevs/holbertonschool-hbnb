@@ -6,16 +6,17 @@ This Repository contains the files for the HBNB project. HBNB replicates the bas
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
+	- [Admin Features](#admin-features)
 	- [User](#user)
 	- [Place](#place)
 	- [Review](#review)
-	- [Ammenity](#ammenity)
+	- [Amenity](#amenity)
 - [Tests](#tests)
 - [Files](#files)
 - [Authors](#authors)
 
 # Features
-CRUD capabilites for User/ Place/ Review/ Ammenities 
+CRUD capabilities for User/ Place/ Review/ Amenities with admin role-based access control 
 
 # Requirements
 This project requires Python version 3.14 or later. To check what version of Python you have installed use the command below:
@@ -42,6 +43,159 @@ Run the application from the holbertonschool-hbnb directory
 python3 run.py
 ```
 Use tools like Postman or cURL to use the API endpoints, below examples use curl:
+
+## Admin Features
+
+This application includes admin functionality that allows administrators to bypass regular user limitations and perform elevated operations.
+
+### Admin Account Setup
+
+#### Elevate User to Admin
+For testing, any authenticated user can elevate themselves to admin using the mock endpoint:
+
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/reviews/elevate_admin" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
+```
+
+**Expected Response:**
+```jsonc
+{
+    "access_token": "new_jwt_token_with_admin_claims"
+}
+
+// 200 OK
+```
+
+**Note:** This endpoint is for testing only and should be removed in production.
+
+#### Database-Level Admin Creation
+In production, admin status should be set directly in the database by modifying the `is_admin` field in the user record.
+
+### Admin Authentication
+
+Admins receive JWT tokens with special claims that identify their elevated status:
+
+```jsonc
+{
+  "identity": "user_id",
+  "additional_claims": {
+    "is_admin": true
+  }
+}
+```
+
+All admin operations are validated by checking these JWT claims on each request.
+
+### Admin-Only Operations
+
+#### Create Amenity (Admin Required)
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/amenities/" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+  -d '{"name": "Swimming Pool"}'
+```
+
+**Expected Response (Admin):**
+```jsonc
+{
+  "id": "amenity-id-123",
+  "name": "Swimming Pool"
+}
+
+// 201 Created
+```
+
+**Expected Response (Non-Admin):**
+```jsonc
+{
+  "error": "Unauthorized action"
+}
+
+// 403 Forbidden
+```
+
+#### Update Amenity (Admin Required)
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/amenities/amenity-id-123" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+  -d '{"name": "Olympic Swimming Pool"}'
+```
+
+#### Delete Amenity (Admin Required)
+```bash
+curl -X DELETE "http://127.0.0.1:5000/api/v1/amenities/amenity-id-123" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE"
+```
+
+### Admin Bypass Capabilities
+
+#### Admin User Management
+Admins can update or delete any user account:
+
+```bash
+# Update any user (admin can modify any user_id)
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/ANY_USER_ID_HERE" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+  -d '{
+    "first_name": "Admin Updated Name"
+  }'
+```
+
+#### Admin Place Management
+Admins can create places for other users and manage any place:
+
+```bash
+# Admin creating a place for another user
+curl -X POST "http://127.0.0.1:5000/api/v1/places/" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+  -d '{
+    "title": "Admin Created Place",
+    "price": 200.0,
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "owner_id": "DIFFERENT_USER_ID_HERE",
+    "amenities": ["amenity-id-123"]
+  }'
+
+# Admin updating any place
+curl -X PUT "http://127.0.0.1:5000/api/v1/places/ANY_PLACE_ID_HERE" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+  -d '{
+    "title": "Admin Updated Title"
+  }'
+```
+
+#### Admin Review Management
+Admins can modify or delete any user's reviews:
+
+```bash
+# Admin updating any review
+curl -X PUT "http://127.0.0.1:5000/api/v1/reviews/ANY_REVIEW_ID_HERE" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+  -d '{
+    "text": "Admin moderated review",
+    "rating": 3
+  }'
+
+# Admin deleting any review
+curl -X DELETE "http://127.0.0.1:5000/api/v1/reviews/ANY_REVIEW_ID_HERE" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE"
+```
+
+### Security Notes
+
+- Admin status is securely stored in JWT additional_claims
+- Users cannot modify email or password
+- All endpoints verify either ownership OR admin status
+- Missing `is_admin` claims default to `false` for security
+
 
 ## User
 
@@ -357,7 +511,7 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/YOUR_USER_ID_HERE" \
 ```
 
 #### Testing Update User — Unauthorized
-Attempting to update another user's information:
+Attempting to update another user's information (Non-Admin):
 ```bash
 curl -X PUT "http://127.0.0.1:5000/api/v1/users/SOMEONE_ELSES_USER_ID" \
   -H "Content-Type: application/json" \
@@ -367,7 +521,7 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/SOMEONE_ELSES_USER_ID" \
   }'
 ```
 
-**Expected Response**
+**Expected Response (Non-Admin)**
 
 ```jsonc
 {
@@ -375,6 +529,30 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/users/SOMEONE_ELSES_USER_ID" \
 }
 
 // 403 Forbidden
+```
+
+#### Testing Update User — Admin Override
+Admins can update any user's information:
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/users/ANY_USER_ID" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+  -d '{
+    "first_name": "Admin Updated Name"
+  }'
+```
+
+**Expected Response (Admin)**
+
+```jsonc
+{
+    "id": "user-id-123",
+    "first_name": "Admin Updated Name", 
+    "last_name": "Original LastName",
+    "email": "user@example.com"
+}
+
+// 200 OK
 ```
 
 #### Testing Update User — No Authentication
@@ -660,7 +838,7 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/places/YOUR_PLACE_ID_HERE" \
 ```
 
 #### Testing Unauthorized Place Update
-Attempting to update someone else's place with your JWT token:
+Attempting to update someone else's place with your JWT token (Non-Admin):
 
 ```bash
 curl -X PUT "http://127.0.0.1:5000/api/v1/places/SOMEONE_ELSES_PLACE_ID" \
@@ -671,13 +849,45 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/places/SOMEONE_ELSES_PLACE_ID" \
   }'
 ```
 
-**Expected Response (Unauthorized Update):**
+**Expected Response (Non-Admin):**
 ```jsonc
 {
   "error": "Unauthorized action"
 }
 
 // 403 Forbidden  
+```
+
+#### Testing Admin Place Update Override
+Admins can update any place regardless of ownership:
+
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/places/ANY_PLACE_ID" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+  -d '{
+    "title": "Admin Updated Place",
+    "description": "Admin can update any place",
+    "price": 350.00
+  }'
+```
+
+**Expected Response (Admin):**
+```jsonc
+{
+  "id": "place-id-123",
+  "title": "Admin Updated Place",
+  "description": "Admin can update any place",
+  "price": 350.0,
+  "latitude": 36.7489,
+  "longitude": -119.7722,
+  "owner_id": "original-owner-id",
+  "amenities": ["amenity-id"],
+  "created_at": "2026-03-13T15:43:16.943669",
+  "updated_at": "2026-03-13T16:12:33.555888"
+}
+
+// 200 OK
 ```
 
 #### Testing Place Update Without Authentication
@@ -791,7 +1001,7 @@ Expected response valid data:
 ```
 
 #### Testing Unauthorized Review Update
-Attempting to update someone else's review:
+Attempting to update someone else's review (Non-Admin):
 ```bash
 curl -X PUT "http://127.0.0.1:5000/api/v1/reviews/SOMEONE_ELSES_REVIEW_ID" \
      -H "Content-Type: application/json" \
@@ -800,13 +1010,33 @@ curl -X PUT "http://127.0.0.1:5000/api/v1/reviews/SOMEONE_ELSES_REVIEW_ID" \
          "text": "Hacked review"
      }'
 ```
-Expected response:
+Expected response (Non-Admin):
 ```jsonc
 {
   "error": "Unauthorized action."
 }
 
 // 403 Forbidden
+```
+
+#### Testing Admin Review Update Override
+Admins can update any review regardless of authorship:
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/reviews/ANY_REVIEW_ID" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+     -d '{
+         "text": "Admin moderated this review",
+         "rating": 3
+     }'
+```
+Expected response (Admin):
+```jsonc
+{
+  "message": "Review updated successfully"
+}
+
+// 200 OK
 ```
 
 #### Testing Review Update Without Authentication
@@ -919,18 +1149,33 @@ Expected response valid data:
 ```
 
 #### Testing Unauthorized Review Deletion
-Attempting to delete someone else's review:
+Attempting to delete someone else's review (Non-Admin):
 ```bash
 curl -X DELETE "http://127.0.0.1:5000/api/v1/reviews/SOMEONE_ELSES_REVIEW_ID" \
      -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
 ```
-Expected response:
+Expected response (Non-Admin):
 ```jsonc
 {
   "error": "Unauthorized action."
 }
 
 // 403 Forbidden
+```
+
+#### Testing Admin Review Deletion Override
+Admins can delete any review regardless of authorship:
+```bash
+curl -X DELETE "http://127.0.0.1:5000/api/v1/reviews/ANY_REVIEW_ID" \
+     -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE"
+```
+Expected response (Admin):
+```jsonc
+{
+  "message": "Review deleted successfully"
+}
+
+// 200 OK
 ```
 
 #### Testing Review Deletion Without Authentication
@@ -946,31 +1191,56 @@ Expected response:
 
 // 401 Unauthorized
 ```
-## Ammenity
-#### CREATE AMENITY
+## Amenity
+**Note:** All amenity creation, updates, and deletion operations require admin privileges.
 
-To Create an amenity, and keeping it clear using the JSON format. Use the below example, while filling the "name" field, with your desired Amenity name.
+#### CREATE AMENITY (Admin Required)
+
+To create an amenity, you must be authenticated as an admin. Use the JSON format below:
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
      -H "Content-Type: application/json" \
-     -d '{"name":"Your Amenity Name Here"}'
+     -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+     -d '{"name":"Swimming Pool"}'
 ```
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
      -H "Content-Type: application/json" \
-     -d '{"name":"Your Second Amenity Name Here"}'
-
+     -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+     -d '{"name":"Fitness Center"}'
 ```
-**Expected Output**
+
+**Expected Output (Admin):**
 ```jsonc
 {
-  "id": 1,
-  "name": "Your Amenity Name Here"
+  "id": "amenity-id-123",
+  "name": "Swimming Pool"
 }
+```
+
+**Expected Output (Non-Admin):**
+```jsonc
 {
-  "id": 2,
-  "name": "Your Second Amenity Name Here"
+  "error": "Unauthorized action"
 }
+
+// 403 Forbidden
+```
+
+#### Testing Amenity Creation Without Authentication
+```bash
+curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Unauthorized Amenity"}'
+```
+
+**Expected Output:**
+```jsonc
+{
+  "msg": "Missing Authorization Header"
+}
+
+// 401 Unauthorized
 ```
 
 #### GET ALL AMENITIES
@@ -1007,35 +1277,59 @@ curl http://127.0.0.1:5000/api/v1/amenities/<1>
  },
 ```
 
-#### CHANGE THE NAME OF AN AMENITY, USING ID
+#### UPDATE AMENITY (Admin Required)
 
-To change the details of an amenity (name), use the following command.
+To update an amenity, you must be authenticated as an admin. Use the amenity ID in the URL:
 ```bash
-curl -X PUT http://127.0.0.1:5000/api/v1/amenities/1 \
+curl -X PUT http://127.0.0.1:5000/api/v1/amenities/AMENITY_ID_HERE \
 -H "Content-Type: application/json" \
--d '{"name": "Updated Name"}'
+-H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE" \
+-d '{"name": "Updated Amenity Name"}'
 ```
-**Expected Output**
+
+**Expected Output (Admin):**
 ```jsonc
 {
-  "id": 1,
-  "name": "Updated Name"
+  "id": "amenity-id-123",
+  "name": "Updated Amenity Name"
 }
+
+// 200 OK
 ```
-It is important that you change the "1" ID as this is how you specify which amenity is being changed
 
-#### DELETE AMENITY
+**Expected Output (Non-Admin):**
+```jsonc
+{
+  "error": "Unauthorized action"
+}
 
-To delete an amenity, use the amenity ID together with a valid JWT token. This endpoint requires authentication, and the user must be an admin or the owner of the amenity.
+// 403 Forbidden
+```
+
+#### DELETE AMENITY (Admin Required)
+
+To delete an amenity, you must be authenticated as an admin:
 ```bash
 curl -X DELETE http://127.0.0.1:5000/api/v1/amenities/YOUR_AMENITY_ID_HERE \
-     -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
+     -H "Authorization: Bearer ADMIN_JWT_TOKEN_HERE"
 ```
-**Expected Output**
+
+**Expected Output (Admin):**
 ```jsonc
 {
   "message": "Amenity deleted successfully"
 }
+
+// 200 OK
+```
+
+**Expected Output (Non-Admin):**
+```jsonc
+{
+  "error": "Unauthorized action"
+}
+
+// 403 Forbidden
 ```
 
 If the amenity does not exist, the API will return:
