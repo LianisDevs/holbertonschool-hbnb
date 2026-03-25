@@ -25,10 +25,28 @@ nav a {
 main {
     padding: 2rem;
 }
+/* logo class name req */
 .logo {
     height: 50px;
     width: auto;
+    transition: transform 0.3s ease;
 }
+
+.logo:hover {
+    transform: scale(1.1);
+}
+/* login-button class name req */
+.login-button {
+    background-color: black;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #333;
+}
+
 #places-list {
     display: flex;
     flex-direction: row;
@@ -39,33 +57,38 @@ main {
     justify-content: center;
     padding: 1rem 0;
 }
+/* place-card class name req */
 .place-card {
     width: 320px;
     height: 400px;
-    margin: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
+    margin: 20px; /* req */
+    padding: 10px; /* req */
+    border: 1px solid #ddd; /* req */
+    border-radius: 10px; /* req */
     display: flex;
     flex-direction: column;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .place-card:hover {
     transform: translateY(-5px) scale(1.02);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
+
 .place-image {
     width: 100%;
     height: 260px;
     margin-bottom: 8px;
 }
+
 .place-image-span {
     width: 100%;
     height: 100%;
     display: block;
 }
+
 .place-image-span img {
     width: 100%;
     height: 100%;
@@ -73,16 +96,19 @@ main {
     border-radius: 5px;
     display: block;
 }
+
 .place-title {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 6px;
 }
+
 .place-price {
     font-size: 0.9rem;
     color: #666;
     margin-bottom: 10px;
 }
+/* details-button class name req */
 .details-button {
     background-color: black;
     color: white;
@@ -93,6 +119,365 @@ main {
     font-size: 0.9rem;
     margin-top: auto;
 }
+
+.details-button a:link, a:visited, a:hover, a:active {
+    text-decoration: none;
+    color: white;
+}
+
 .details-button:hover {
     background-color: grey;
 }
+/* place-details class name req */
+.place-details {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.place-info {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.place-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.place-header h1 {
+    color: #333;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+    flex: 1;
+}
+
+.place-details-image {
+    width: 100%;
+    max-width: 100%;
+    margin: 1.5rem 0;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.place-details-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    max-height: 400px;
+}
+
+.place-details-price {
+    font-size: 1.6rem;
+    color: black;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+.place-details-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+    
+}
+
+.place-details-host {
+    margin-bottom: 2rem;
+}
+
+.place-details-host h3, .place-amenities h3 {
+    color: #333;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.place-details-host-info {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #555;
+}
+
+.place-details-amenities {
+    margin-top: 2rem;
+}
+
+.place-details-amenities ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0;
+}
+
+.place-details-amenities li {
+    background: #333;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* Reviews Section */
+#place-details-reviews {
+    max-width: 1000px;
+    margin: 0 auto 2rem auto;
+    padding: 1rem;
+}
+
+#place-details-reviews h2 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.place-details-no-reviews {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 2rem;
+}
+/* review-card class name req */
+.review-card {
+    background: white;
+    margin: 20px; /* req */
+    padding: 10px; /* req */
+    border: 1px solid #ddd; /* req */
+    border-radius: 10px; /* req */
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.review-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.review-author {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.review-rating {
+    font-size: 1.2rem;
+    color: #ffd700;
+}
+
+.review-text {
+    color: #555;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+/* Add Review Section */
+.add-review {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.add-review h2 {
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #333;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.char-count {
+    display: block;
+    text-align: right;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+#submit-review {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+#submit-review:hover {
+    background-color: #555;
+}
+
+#submit-review:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#add-review-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+#add-review-button:hover {
+    background-color: #555;
+}
+
+#login-prompt {
+    text-align: center;
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#login-prompt a {
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#login-prompt a:hover {
+    text-decoration: underline;
+}
+
+/* Add Review Page Specific Styles */
+.place-info-small {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.place-info-small h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.place-info-small p {
+    color: #666;
+    margin: 0;
+}
+
+.form-actions {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.secondary-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.secondary-button:hover {
+    background-color: #545b62;
+}
+
+/* Dynamic form container */
+#review-form-container {
+    width: 100%;
+}
+
+#review-form-container .form {
+    margin: 0;
+}
+
+/* Show Review Form Button */
+#show-form-section {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+#show-review-form-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+#show-review-form-btn:hover {
+    background-color: #555;
+}
+
+/* Form spacing adjustments */
+.form .secondary-button {
+    margin-top: 1rem;
+    margin-left: 1rem;
+}
+
