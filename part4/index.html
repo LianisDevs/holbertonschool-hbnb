@@ -8,8 +8,10 @@
 </head>
 <body>
     <header>
+        
         <nav>
-            <a href="login.html" id="login-link">Login</a>
+            <a href="index.html" id="index-link" class="index-button"><img src="images/logo.png" class="logo"></a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
         </nav>
     </header>
     <main>
@@ -20,9 +22,119 @@
             </select>
         </section>
         <section id="places-list">
-            <!-- List of places will be populated dynamically -->
+            <div class="place-card">
+                <div class="place-image-container">
+                        <div class="place-image" role="img" aria-label="Property exterior view">
+                            <span class="place-image-span"><img src="images/place_1.jpg"></span>
+                        </div>
+                        <div class="place-title">
+                            <p>Fancy Mansion</p>
+                        </div>
+                        <div class="place-price">
+                            <p>$150,000,000 per night</p>
+                        </div>
+                        <button type="button" 
+                                class="details-button" 
+                                aria-label="Click to view details">
+                                View Details
+                        </button>
+                    </div>
+            </div>
+            <div class="place-card">
+                <div class="place-image-container">
+                        <div class="place-image" role="img" aria-label="Property exterior view">
+                            <span class="place-image-span"><img src="images/place_2.jpg"></span>
+                        </div>
+                        <div class="place-title">
+                            <p>A Literal Rocketship</p>
+                        </div>
+                        <div class="place-price">
+                            <p>$120,000,000 per night</p>
+                        </div>
+                        <button type="button" 
+                                class="details-button" 
+                                aria-label="Click to view details">
+                                View Details
+                        </button>
+                    </div>
+            </div>
+            <div class="place-card">
+                <div class="place-image-container">
+                        <div class="place-image" role="img" aria-label="Property exterior view">
+                            <span class="place-image-span"><img src="images/place_3.jpg"></span>
+                        </div>
+                        <div class="place-title">
+                            <p>Supervillain Hideout</p>
+                        </div>
+                        <div class="place-price">
+                            <p>$850,000 per night</p>
+                        </div>
+                        <button type="button" 
+                                class="details-button" 
+                                aria-label="Click to view details">
+                                View Details
+                        </button>
+                    </div>
+            </div>
+            <div class="place-card">
+                <div class="place-image-container">
+                        <div class="place-image" role="img" aria-label="Property exterior view">
+                            <span class="place-image-span"><img src="images/place_4.jpg"></span>
+                        </div>
+                        <div class="place-title">
+                            <p>Dracula's Castle</p>
+                        </div>
+                        <div class="place-price">
+                            <p>$200,000 per night</p>
+                        </div>
+                        <button type="button" 
+                                class="details-button" 
+                                aria-label="Click to view details">
+                                View Details
+                        </button>
+                    </div>
+            </div>
+            <div class="place-card">
+                <div class="place-image-container">
+                        <div class="place-image" role="img" aria-label="Property exterior view">
+                            <span class="place-image-span"><img src="images/place_5.jpg"></span>
+                        </div>
+                        <div class="place-title">
+                            <p>Golden Palace</p>
+                        </div>
+                        <div class="place-price">
+                            <p>$95,000,000 per night</p>
+                        </div>
+                        <button type="button" 
+                                class="details-button" 
+                                aria-label="Click to view details">
+                                View Details
+                        </button>
+                    </div>
+            </div>
+            <div class="place-card">
+                <div class="place-image-container">
+                        <div class="place-image" role="img" aria-label="Property exterior view">
+                            <span class="place-image-span"><img src="images/place_6.jpg"></span>
+                        </div>
+                        <div class="place-title">
+                            <p>Private Island</p>
+                        </div>
+                        <div class="place-price">
+                            <p>$150,000,000,000 per night</p>
+                        </div>
+                        <button type="button" 
+                                class="details-button" 
+                                aria-label="Click to view details">
+                                View Details
+                        </button>
+                    </div>
+            </div>
         </section>
     </main>
+    <footer>
+        All rights reserved. 
+    </footer>
     <script src="scripts.js"></script>
 </body>
 </html>
