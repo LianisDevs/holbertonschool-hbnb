@@ -1,4 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
+	        const loginSection = document.getElementById("login-section");
+          const signupSection = document.getElementById("signup-section");
+
+//  sign up function
+		          document
+                .getElementById("goToSignup")
+                .addEventListener("click", () => {
+                  loginSection.style.display = "none";
+                  signupSection.style.display = "block";
+				  document.body.style.overflow = "auto";
+                });
+
+				// login function
+				document.getElementById("goToLogin").addEventListener("click", () => {
+          signupSection.style.display = "none";
+          loginSection.style.display = "block";
+    document.body.style.overflow = "hidden";
+
+        });
 	const loginForm = document.getElementById('login-form');
 
 	if (loginForm) {
@@ -31,5 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		});
 	}
+
 });
 
