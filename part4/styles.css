@@ -175,7 +175,10 @@ main {
     object-fit: cover;
     max-height: 400px;
 }
-
+.place-details-image img:not([src]),
+.place-details-image img[src=""] {
+    display: none;
+}
 .place-details-price {
     font-size: 1.6rem;
     color: black;
