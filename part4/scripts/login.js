@@ -5,15 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Toggle: Login → Sign Up 
   document.getElementById("goToSignup").addEventListener("click", () => {
     loginSection.style.display = "none";
-    signupSection.style.display = "block";
-    document.body.style.overflow = "auto";
+    signupSection.style.display = "block"; 
   });
 
   //Toggle: Sign Up → Login 
   document.getElementById("goToLogin").addEventListener("click", () => {
     signupSection.style.display = "none";
-    loginSection.style.display = "block";
-    document.body.style.overflow = "hidden";
+    loginSection.style.display = "block"; 
   });
 
   // Login submit 
@@ -76,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
       signupForm.reset();
       signupSection.style.display = "none";
       loginSection.style.display = "block";
-      document.body.style.overflow = "hidden";
     } else {
       alert("Sign up failed: " + response.statusText);
     }

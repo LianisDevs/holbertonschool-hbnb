@@ -26,7 +26,7 @@ html,
 body {
   height: 100%;
   font-family: "Cardo", serif;
-  overflow: hidden;
+  overflow: auto;
 }
 /* ── Login Background ── */
 .bg {
@@ -200,20 +200,6 @@ input#password {
 
 .forgot-row a:hover span {
   color: var(--brown);
-}
-#signup-section.active {
-  overflow-y: auto;
-}
-
-.page:has(#signup-section[style*="block"]) {
-  overflow-y: auto;
-  align-items: flex-start;
-  padding: 40px 16px;
-}
-
-html:has(#signup-section[style*="block"]),
-body:has(#signup-section[style*="block"]) {
-  overflow-y: auto;
 }
 
 /* ── Login Error ── */
