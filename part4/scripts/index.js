@@ -67,6 +67,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await fetchPlaces();
 
+    placesContainer.addEventListener("click", (event) => {
+      if (event.target.classList.contains("details-button")) {
+        const placeId = event.target.getAttribute("data-id");
+        window.location.href = `place.html?id=${placeId}`;
+      }
+    });
+
     const filterPrice = document.getElementById('price-filter');
 
     filterPrice.addEventListener('change', (event) => {

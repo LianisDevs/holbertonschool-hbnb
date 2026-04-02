@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Details</title>
+        <link rel="stylesheet" href="/part4/styles.css">
+</head>
+<body>
+        <header>
+        
+        <nav>
+            <a href="index.html" id="index-link" class="index-button"><img src="/part4/images/logo.png" class="logo"></a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
+        </nav>
+    </header>
+    <main>
+        <section id="place-details" class="place-details">
+            <div class="place-info">
+                    <div class="place-header">
+                        <h1 id="place-details-title"></h1>
+                        </div>
+                    <div class="place-details-image">
+                        <img src="" alt="Place image">
+                    </div>
+                            <div class="place-details-host">
+                                <h3>Host:</h3>
+                            <div id="place-details-host-info"></div>
+                        </div>
+                    <div class="place-details-price" id="place-details-price"></div>
+                    <div class="place-details-description" id="place-details-description"></div>
+                    <div class="place-details-amenities">
+                        <h3>Amenities</h3>
+                        <ul id="place-details-amenities-list">
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                    </div>
+                </div>
+        </section>
+
+        <section id="place-details-reviews">
+            <h2>Reviews</h2>
+            <div id="place-details-reviews-content">
+                <div id="place-details-reviews-list">
+                    <!-- Review 1 -->
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-author"></div>
+                            <div class="review-rating"></div>
+                        </div>
+                        <div class="review-text"></div>
+                    </div>
+                    
+                    
+                </div>
+                <div id="place-details-no-reviews" class="place-details-no-reviews" style="display: none;">
+                    <p>No reviews yet. Be the first to review this place!</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="add-review" class="add-review">
+            <div id="login-prompt" style="display: none;">
+                <p>Please <a href="login.html">log in</a> to leave a review.</p>
+                <button id="add-review-button" onclick="window.location.href='add_review.html'">
+                    Add Review
+                </button>
+            </div>
+            
+            <!-- Show Review Form Button -->
+            <div id="show-form-section">
+                <button id="show-review-form-btn" onclick="toggleReviewForm()">
+                    Add a Review
+                </button>
+            </div>
+            
+            <!-- Hidden Review Form -->
+            <div id="review-form-container" style="display: none;" class="form">
+                <h2>Add a Review</h2>
+                <form id="review-form">
+                    <div class="form-group">
+                        <label for="review-text">Your Review:</label>
+                        <textarea id="review-text" name="review-text" rows="4" maxlength="1000" required 
+                                  placeholder="Share your experience at this place..."></textarea>
+                        <small class="char-count">0/1000 characters</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rating">Rating:</label>
+                        <select id="rating" name="rating" required>
+                            <option value="">Select a rating</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" id="submit-review">Submit Review</button>
+                    <button type="button" onclick="toggleReviewForm()" class="secondary-button">
+                        Cancel
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer>
+        All rights reserved. 
+    </footer>
+    <script src="/part4/scripts/place.js"></script>
+</body>
+</html>
