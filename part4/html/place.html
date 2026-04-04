@@ -12,6 +12,7 @@
         <nav>
             <a href="index.html" id="index-link" class="index-button"><img src="/part4/images/logo.png" class="logo"></a>
             <a href="login.html" id="login-link" class="login-button">Login</a>
+            <button id="logout-btn" class="login-button" type="button" style="display: none;">Logout</button>
         </nav>
     </header>
     <main>
@@ -64,14 +65,14 @@
         <section id="add-review" class="add-review">
             <div id="login-prompt" style="display: none;">
                 <p>Please <a href="login.html">log in</a> to leave a review.</p>
-                <button id="add-review-button" onclick="window.location.href='add_review.html'">
+                <button id="add-review-button" type="button">
                     Add Review
                 </button>
             </div>
-            
-            <!-- Show Review Form Button -->
+
+            <!-- Redirect button (authenticated users) -->
             <div id="show-form-section">
-                <button id="show-review-form-btn" onclick="toggleReviewForm()">
+                <button id="show-review-form-btn" type="button">
                     Add a Review
                 </button>
             </div>

@@ -14,6 +14,7 @@
         <nav>
             <a href="index.html" id="index-link" class="index-button"><img src="/part4/images/logo.png" class="logo"></a>
             <a href="login.html" id="login-link" class="login-button">Login</a>
+            <button id="logout-btn" class="login-button" type="button" style="display: none;">Logout</button>
         </nav>
     </header>
     <main>
@@ -26,6 +27,25 @@
                 <option value="100">100</option>
             </select>
         </section>
+
+        <!-- New toggle button (hidden unless authenticated in JS) -->
+        <section id="create-place-toggle-section" style="display: none;">
+            <button id="create-place-toggle-btn" type="button">Create Place</button>
+        </section>
+
+        <section id="create-place-section" style="display: none;">
+            <h2>Create Place</h2>
+            <form id="create-place-form">
+                <input id="place-title" type="text" placeholder="Title" required>
+                <input id="place-description" type="text" placeholder="Description">
+                <input id="place-price" type="number" placeholder="Price" step="0.01" required>
+                <input id="place-latitude" type="number" placeholder="Latitude" step="0.000001" required>
+                <input id="place-longitude" type="number" placeholder="Longitude" step="0.000001" required>
+                <button type="submit">Create</button>
+            </form>
+            <p id="create-place-msg"></p>
+        </section>
+
         <section id="places-list">
             <div class="place-card">
                 <div class="place-image-container">
@@ -43,7 +63,6 @@
                     </button>
                 </div>
             </div>
-
         </section>
     </main>
     <footer>
