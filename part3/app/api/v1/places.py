@@ -1,3 +1,4 @@
+from flask import current_app
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from part3.app.services import facade
@@ -37,59 +38,51 @@ place_update_model = api.model('Place', {
 
 @api.route('/')
 class PlaceList(Resource):
-    @api.expect(place_model)
-    @api.response(201, 'Place successfully created')
-    @api.response(400, 'Invalid input data')
-    @api.response(401, 'Authentication required')
-    @api.response(403, 'Unauthorized action')
     @jwt_required()
+    @api.expect(place_model, validate=True)
     def post(self):
-        """Register a new place"""
-        # Get current user from JWT token
-        current_user_id = get_jwt_identity()
-        claims = get_jwt()
-        is_admin = claims.get('is_admin', False)
-
-        place_data = api.payload
-
-        # Setting owner_id to authorized user from get_jwt_identity()
-        if 'owner_id' in place_data:
-            if place_data['owner_id'] != current_user_id and not is_admin:
-                return {"error": "Unauthorized action- cannot create place for another user"}, 403
-        else:
-            place_data['owner_id'] = current_user_id
-
-        if 'amenities' in place_data:
-            for amenity_id in place_data['amenities']:
-                amenity = facade.amenity_repo.get(amenity_id)
-                if not amenity:
-                    return {'error': f'Amenity with id {amenity_id} not found'}, 404
-
         try:
-            # Create place using facade
-            place = facade.create_place(place_data['owner_id'], place_data)
-            if not place:
-                return {'error': 'Failed to create place'}, 400
+            payload = api.payload or {}
+            identity = get_jwt_identity()
 
-            return {
-                'id': place.id,
-                'title': place.title,
-                'description': place.description,
-                'price': place.price,
-                'latitude': place.latitude,
-                'longitude': place.longitude,
-                'owner_id': place.owner_id,
-                'amenities': [amenity.name for amenity in place.amenities],
-                'reviews': [],
-                'created_at': place.created_at.isoformat(),
-                'updated_at': place.updated_at.isoformat()
-            }, 201
+            owner_id = identity.get("id") if isinstance(identity, dict) else identity
+            if not owner_id:
+                return {"error": "Unauthorized"}, 401
+
+            required = ["title", "price", "latitude", "longitude"]
+            missing = [k for k in required if payload.get(k) is None]
+            if missing:
+                return {"error": f"Missing fields: {', '.join(missing)}"}, 400
+
+            payload.setdefault("amenities", [])
+
+            place = facade.create_place(owner_id, payload)
+
+            amenities_data = [
+                {"id": amenity.id, "name": amenity.name}
+                for amenity in place.amenities
+            ]
+
+            place_data = {
+                "id": place.id,
+                "title": place.title,
+                "description": place.description,
+                "price": float(place.price),
+                "latitude": place.latitude,
+                "longitude": place.longitude,
+                "owner_id": place.owner_id,
+                "amenities": amenities_data,
+                "created_at": place.created_at.isoformat(),
+                "updated_at": place.updated_at.isoformat()
+            }
+
+            return place_data, 201
 
         except ValueError as e:
-            return {'error': str(e)}, 400
-
+            return {"error": str(e)}, 400
         except Exception:
-            return {'error': 'Internal server error'}, 500
+            current_app.logger.exception("Failed to create place")
+            return {"error": "Internal server error"}, 500
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):

@@ -14,13 +14,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const authToken = getCookie("token");
   const loginButton = document.getElementById("login-link");
+  const logoutButton = document.getElementById("logout-btn");
 
   //   hide login button
   if (authToken) {
     loginButton.style.display = "none";
+    logoutButton.style.display = "inline-block";
   } else {
-    loginButton.style.display = "block";
+    loginButton.style.display = "inline-block";
+    logoutButton.style.display = "none";
   }
+
+  if (logoutButton) {
+    logoutButton.addEventListener("click", () => {
+      document.cookie = "token=; Max-Age=0; path=/";
+      window.location.reload(); // stay on place.html
+    });
+  }
+
+  const addReviewButton = document.getElementById("add-review-button");
+  const showReviewFormBtn = document.getElementById("show-review-form-btn");
+
+  const goToAddReview = () => {
+    if (!placeId) return;
+    window.location.href = `add_review.html?id=${encodeURIComponent(placeId)}`;
+  };
+
+  if (addReviewButton) addReviewButton.addEventListener("click", goToAddReview);
+  if (showReviewFormBtn) showReviewFormBtn.addEventListener("click", goToAddReview);
+
   // check if place id exists in url
   if (!placeId) {
     window.location.href = "index.html";
@@ -54,7 +76,44 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const place = await fetchPlaceDetails(placeId);
 
-  function displayPlaceDetails(place) {
+  function getReviewerId(review) {
+    if (review.user_id) return review.user_id;
+    if (typeof review.user === "string") return review.user; // <-- important
+    if (review.user && review.user.id) return review.user.id;
+    return null;
+  }
+
+  function getReviewerNameFromReview(review) {
+    if (review.user_name) return review.user_name;
+    if (review.user && typeof review.user === "object") {
+      const full = review.user.full_name ||
+        `${review.user.first_name || ""} ${review.user.last_name || ""}`.trim();
+      if (full) return full;
+    }
+    return null;
+  }
+
+  async function fetchUserFullName(userId, authToken) {
+    if (!userId) return null;
+    try {
+      const headers = {};
+      if (authToken) headers.Authorization = `Bearer ${authToken}`;
+
+      const res = await fetch(`/api/v1/users/${userId}`, { headers });
+      if (!res.ok) return null;
+
+      const user = await res.json();
+      return (
+        user.full_name ||
+        `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+        null
+      );
+    } catch {
+      return null;
+    }
+  }
+
+  async function displayPlaceDetails(place) {
     const placeDetails = document.getElementById("place-details");
 
     if (!place) {
@@ -93,19 +152,39 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (place.reviews && place.reviews.length > 0) {
       noReviews.style.display = "none";
-      reviewsList.innerHTML = place.reviews
-        .map(
-          (review) => `
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-author">${review.id}</div>
-                    <div class="review-rating">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
-                </div>
-                <div class="review-text">${review.text}</div>
+
+      // Preload missing reviewer names
+      const nameCache = {};
+      const missingUserIds = [
+        ...new Set(
+          place.reviews
+            .map((r) => getReviewerId(r))
+            .filter(Boolean),
+        ),
+      ];
+
+      await Promise.all(
+        missingUserIds.map(async (uid) => {
+          nameCache[uid] = await fetchUserFullName(uid, authToken);
+        }),
+      );
+
+      reviewsList.innerHTML = place.reviews.map((review) => {
+        const reviewerId = getReviewerId(review);
+        const directName = getReviewerNameFromReview(review);
+        const fallbackName = reviewerId ? nameCache[reviewerId] : null;
+        const authorName = directName || fallbackName || "Anonymous";
+
+        return `
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-author">${authorName}</div>
+              <div class="review-rating">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
             </div>
-        `,
-        )
-        .join("");
+            <div class="review-text">${review.text}</div>
+          </div>
+        `;
+      }).join("");
     } else {
       reviewsList.innerHTML = "";
       noReviews.style.display = "block";
