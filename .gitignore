@@ -1,2 +1,5 @@
 *.pyc
 pytest.ini
+instance/development.db
+pld.py 
+reviews.py 
