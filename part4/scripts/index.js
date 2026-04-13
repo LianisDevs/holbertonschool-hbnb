@@ -16,19 +16,101 @@ document.addEventListener('DOMContentLoaded', async () => {
     const createPlaceToggleSection = document.getElementById('create-place-toggle-section');
     const createPlaceToggleBtn = document.getElementById('create-place-toggle-btn');
 
+    const heroImg = document.getElementById('hero-slide');
+    const slideA = document.getElementById('hero-slide-a');
+    const slideB = document.getElementById('hero-slide-b');
+
+    if (heroImg) {
+        const slides = [
+            '/part4/images/hero1.jpg',
+            '/part4/images/hero2.jpg',
+            '/part4/images/hero3.jpg'
+        ];
+
+        // preload slides to avoid flicker
+        slides.forEach((src) => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        let i = 0;
+        const FADE_MS = 900;
+        const INTERVAL_MS = 5500;
+
+        setInterval(() => {
+            i = (i + 1) % slides.length;
+
+            heroImg.style.opacity = '0';
+
+            setTimeout(() => {
+                heroImg.src = slides[i];
+                requestAnimationFrame(() => {
+                    heroImg.style.opacity = '1';
+                });
+            }, FADE_MS);
+        }, INTERVAL_MS);
+    }
+
+    if (slideA && slideB) {
+        const slides = [
+            '/part4/images/hero1.jpg',
+            '/part4/images/hero2.jpg',
+            '/part4/images/hero3.jpg',
+            '/part4/images/hero4.jpg',
+            '/part4/images/hero5.jpg',
+            '/part4/images/hero6.jpg',
+            '/part4/images/hero7.jpg',
+            '/part4/images/hero8.jpg',
+            '/part4/images/hero9.jpg'
+        ];
+
+        // preload
+        slides.forEach((src) => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        let idx = 0;
+        let active = slideA;
+        let inactive = slideB;
+
+        // ensure initial state
+        active.src = slides[idx];
+        active.classList.add('is-active');
+        inactive.classList.remove('is-active');
+
+        setInterval(() => {
+            idx = (idx + 1) % slides.length;
+
+            // prepare next image under current one
+            inactive.src = slides[idx];
+
+            // next frame: crossfade (no blank gap)
+            requestAnimationFrame(() => {
+                inactive.classList.add('is-active');
+                active.classList.remove('is-active');
+
+                // swap refs
+                const tmp = active;
+                active = inactive;
+                inactive = tmp;
+            });
+        }, 5000);
+    }
+
     if (authToken) {
         loginButton.style.display = 'none';
         if (logoutButton) logoutButton.style.display = 'inline-block';
 
         // show toggle button, keep form hidden initially
         if (createPlaceToggleSection) createPlaceToggleSection.style.display = 'block';
-        if (createPlaceSection) createPlaceSection.style.display = 'none';
+        if (createPlaceSection) createPlaceSection.classList.remove("is-open"); // start closed
 
         console.log('User is signed in');
     } else {
         if (logoutButton) logoutButton.style.display = 'none';
         if (createPlaceToggleSection) createPlaceToggleSection.style.display = 'none';
-        if (createPlaceSection) createPlaceSection.style.display = 'none';
+        if (createPlaceSection) createPlaceSection.classList.remove("is-open");
         console.log('User is not signed in');
     }
 
@@ -177,11 +259,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    if (createPlaceToggleBtn) {
-        createPlaceToggleBtn.addEventListener('click', () => {
-            const isHidden = createPlaceSection.style.display === 'none' || createPlaceSection.style.display === '';
-            createPlaceSection.style.display = isHidden ? 'block' : 'none';
-            createPlaceToggleBtn.textContent = isHidden ? 'Hide Create Place' : 'Create Place';
+    if (createPlaceToggleBtn && createPlaceSection) {
+        createPlaceToggleBtn.addEventListener("click", () => {
+            const open = createPlaceSection.classList.toggle("is-open");
+            createPlaceToggleBtn.textContent = open ? "Hide Create Place" : "Create Place";
         });
     }
+
+    // Header: expanded only at top, minimized when scrolled
+    const header = document.querySelector('header');
+    const TOP_THRESHOLD = 8;
+    const mainEl = document.querySelector('main');
+
+    function getScrollTop() {
+        const doc = document.documentElement;
+        const body = document.body;
+        const scrollingEl = document.scrollingElement;
+
+        return Math.max(
+            window.scrollY || 0,
+            doc ? doc.scrollTop : 0,
+            body ? body.scrollTop : 0,
+            scrollingEl ? scrollingEl.scrollTop : 0,
+            mainEl ? mainEl.scrollTop : 0
+        );
+    }
+
+    function syncHeaderState() {
+        if (!header) return;
+        const y = getScrollTop();
+        header.classList.toggle('is-expanded', y <= TOP_THRESHOLD);
+    }
+
+    syncHeaderState();
+
+    // catch scroll from window OR nested scroll containers
+    window.addEventListener('scroll', syncHeaderState, { passive: true });
+    document.addEventListener('scroll', syncHeaderState, { passive: true, capture: true });
+    if (mainEl) mainEl.addEventListener('scroll', syncHeaderState, { passive: true });
+    window.addEventListener('resize', syncHeaderState, { passive: true });
 });

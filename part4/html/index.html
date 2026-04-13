@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List of Places</title>
     <link rel="stylesheet" href="/part4/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -18,14 +21,14 @@
         </nav>
     </header>
     <main>
-        <section id="filter">
-            <label for="price-filter">Max Price:</label>
-            <select id="price-filter">
-                <option value="all">All</option>
-                <option value="10">10</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
+        <section class="hero">
+            <img id="hero-slide-a" class="hero-slide is-active" src="/part4/images/hero1.jpg" alt="Featured place">
+            <img id="hero-slide-b" class="hero-slide" src="/part4/images/hero2.jpg" alt="Featured place">
+            <div class="hero-overlay">
+                <h1>Don't dream of luxury, <i>live it.</i></h1>
+                <p>Find your luxury with LULA.</p>
+                <a href="#places-list" class="hero-cta">Browse Places</a>
+            </div>
         </section>
 
         <!-- New toggle button (hidden unless authenticated in JS) -->
@@ -33,7 +36,7 @@
             <button id="create-place-toggle-btn" type="button">Create Place</button>
         </section>
 
-        <section id="create-place-section" style="display: none;">
+        <section id="create-place-section">
             <h2>Create Place</h2>
             <form id="create-place-form">
                 <input id="place-title" type="text" placeholder="Title" required>
@@ -41,11 +44,22 @@
                 <input id="place-price" type="number" placeholder="Price" step="0.01" required>
                 <input id="place-latitude" type="number" placeholder="Latitude" step="0.000001" required>
                 <input id="place-longitude" type="number" placeholder="Longitude" step="0.000001" required>
-                <button type="submit">Create</button>
+                <button id="create-place-btn" type="submit">Create</button>
             </form>
             <p id="create-place-msg"></p>
         </section>
-
+        <section id="filter">
+            <label for="price-filter">Maximum Price:</label>
+            <select id="price-filter">
+                <option value="all">All</option>
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="250">250</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+            </select>
+        </section>
         <section id="places-list">
             <div class="place-card">
                 <div class="place-image-container">
@@ -66,7 +80,8 @@
         </section>
     </main>
     <footer>
-        All rights reserved.
+        <img src="/part4/images/logo_text_cream.png" id="footer-logo">
+        <i>2026. All rights reserved. LULA was created by Liani, Uliana, Lachie and Anthonia.</i>
     </footer>
     <script src="/part4/scripts/index.js"></script>
 </body>
