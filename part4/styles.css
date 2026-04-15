@@ -1035,3 +1035,43 @@ footer {
   max-width: 400px;
   align-self: center;
 }
+
+/* Notification Alert */
+.toast {
+  position: fixed;
+ top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background-color: #3b1a0e;
+  color: #f5e6d3;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 9999;
+  min-width: 260px;
+  text-align: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(59, 26, 14, 0.25);
+}
+
+.toast.toast--success {
+  background-color: #3b1a0e;
+  border-left: 4px solid #a37c5e;
+}
+
+.toast.toast--error {
+  background-color: #6b1a1a;
+  border-left: 4px solid #c0392b;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}

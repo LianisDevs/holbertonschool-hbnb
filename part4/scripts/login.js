@@ -1,20 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Toast function
+  function showToast(msg, type = "error") {
+    const toast = document.getElementById("toast");
+    const toastMsg = document.getElementById("toast-message");
+    const toastIcon = document.getElementById("toast-icon");
+
+    toastIcon.textContent = type === "success" ? "✓" : "✕";
+    toastMsg.textContent = msg;
+    toast.className = `toast toast--${type}`;
+    toast.classList.add("show");
+
+    setTimeout(() => toast.classList.remove("show"), 3500);
+  }
+    function showError(msg) {
+      showToast(msg, "error");
+    }
+
   const loginSection = document.getElementById("login-section");
   const signupSection = document.getElementById("signup-section");
 
-  // Toggle: Login → Sign Up 
+  // Toggle: Login → Sign Up
   document.getElementById("goToSignup").addEventListener("click", () => {
     loginSection.style.display = "none";
-    signupSection.style.display = "block"; 
+    signupSection.style.display = "block";
   });
 
-  //Toggle: Sign Up → Login 
+  //Toggle: Sign Up → Login
   document.getElementById("goToLogin").addEventListener("click", () => {
     signupSection.style.display = "none";
-    loginSection.style.display = "block"; 
+    loginSection.style.display = "block";
   });
 
-  // Login submit 
+  // Login submit
   const loginForm = document.getElementById("login-form");
 
   if (loginForm) {
@@ -41,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.cookie = `token=${data.access_token}; path=/`;
       window.location.href = "index.html";
     } else {
-      alert("Login failed: " + response.statusText);
+       showError("Login failed: " + response.statusText);
     }
   }
 
@@ -68,14 +85,19 @@ document.addEventListener("DOMContentLoaded", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ first_name, last_name, email, password }),
     });
-
+          if (response.status === 400) {
+            const errorData = await response.json();
+            showError(errorData.error );
+            return;
+          }
+ 
     if (response.ok) {
-      alert("Account created! Please sign in.");
+      showError("Account created! Please sign in.");
       signupForm.reset();
       signupSection.style.display = "none";
       loginSection.style.display = "block";
     } else {
-      alert("Sign up failed: " + response.statusText);
+      showError("Sign up failed: " + response.statusText);
     }
   }
 });
