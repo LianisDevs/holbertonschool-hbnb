@@ -1,3 +1,4 @@
+// Run setup once the page is fully loaded
 document.addEventListener('DOMContentLoaded', async () => {
     // get the value of a cookie using it's name
     function getCookie(name) {
@@ -6,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
 
+    // Cache auth state and key DOM elements
     const authToken = getCookie('token');
     const loginButton = document.getElementById('login-link');
     const logoutButton = document.getElementById('logout-btn');
@@ -16,10 +18,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const createPlaceToggleSection = document.getElementById('create-place-toggle-section');
     const createPlaceToggleBtn = document.getElementById('create-place-toggle-btn');
 
+    // Cache hero slideshow elements
     const heroImg = document.getElementById('hero-slide');
     const slideA = document.getElementById('hero-slide-a');
     const slideB = document.getElementById('hero-slide-b');
 
+    // Single-image hero slideshow
     if (heroImg) {
         const slides = [
             '/part4/images/hero1.jpg',
@@ -37,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const FADE_MS = 900;
         const INTERVAL_MS = 5500;
 
+        // Rotate hero images with fade effect
         setInterval(() => {
             i = (i + 1) % slides.length;
 
@@ -51,6 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, INTERVAL_MS);
     }
 
+    // Two-layer crossfade hero slideshow
     if (slideA && slideB) {
         const slides = [
             '/part4/images/hero1.jpg',
@@ -79,6 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         active.classList.add('is-active');
         inactive.classList.remove('is-active');
 
+        // Swap active/inactive layers for smooth crossfade
         setInterval(() => {
             idx = (idx + 1) % slides.length;
 
@@ -98,6 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 5000);
     }
 
+    // Show/hide auth-related UI based on token presence
     if (authToken) {
         loginButton.style.display = 'none';
         if (logoutButton) logoutButton.style.display = 'inline-block';
@@ -114,16 +122,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('User is not signed in');
     }
 
+    // Clear token and refresh page on logout
     if (logoutButton) {
         logoutButton.addEventListener("click", () => {
             document.cookie = "token=; Max-Age=0; path=/";
             window.location.reload(); // stay on index.html
         });
     }
-
+// function to fetch places for index
     async function fetchPlaces() {
 
         try {
+            // Request place list from API
             const response = await fetch('http://127.0.0.1:5000/api/v1/places/', {
                 method: 'GET',
                 headers: {
@@ -132,15 +142,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
+            // Stop if request failed
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const places = await response.json();
+            // Reset list before rendering
             placesContainer.innerHTML = '';
 
             // display the places in place cards
             places.forEach(place => {
+                // Build a card for each place
                 const article = document.createElement('article');
                 article.className = 'place-card';
 
@@ -161,15 +174,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                          <button class="details-button" data-id="${place.id}">View Details</button>
                          `;
 
+                // Add card to DOM
                 placesContainer.appendChild(article);
             })
 
         } catch (error) {
+            // Log API or render errors
             console.error('Could not fetch places:', error);
         }
     }
+    // Initial fetch on page load
     await fetchPlaces();
 
+    // Navigate to place details when clicking a card button
     placesContainer.addEventListener("click", (event) => {
       if (event.target.classList.contains("details-button")) {
         const placeId = event.target.getAttribute("data-id");
@@ -177,8 +194,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
+    // Cache price filter element
     const filterPrice = document.getElementById('price-filter');
-
+// filter prices function
+    // Filter visible cards by selected max price
     filterPrice.addEventListener('change', (event) => {
         const selectedPrice = event.target.value;
         const placeCards = placesContainer.querySelectorAll('.place-card');
@@ -195,8 +214,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         })
     })
-
+// function for creating a place if authenticated user
     async function createPlace(payload) {
+        // Send create-place request
         const response = await fetch('/api/v1/places/', {
             method: 'POST',
             headers: {
@@ -205,7 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             body: JSON.stringify(payload)
         });
-
+// error messaging for creating place
         if (!response.ok) {
             let details = '';
             try {
@@ -216,29 +236,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             throw new Error(`Create failed: ${response.status} ${details}`);
         }
+        // Return created place JSON
         return response.json();
     }
 
+    // Handle create-place form submit
     if (createPlaceForm) {
         createPlaceForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!authToken) return;
 
+            // Read form fields
             const titleEl = document.getElementById('place-title');
             const descEl = document.getElementById('place-description');
             const priceEl = document.getElementById('place-price');
             const latEl = document.getElementById('place-latitude');
             const lonEl = document.getElementById('place-longitude');
 
+            // Convert numeric inputs
             const price = Number(priceEl?.value);
             const latitude = Number(latEl?.value);
             const longitude = Number(lonEl?.value);
 
+            // Validate required values
             if (!titleEl?.value?.trim() || !Number.isFinite(price) || !Number.isFinite(latitude) || !Number.isFinite(longitude)) {
                 if (createPlaceMsg) createPlaceMsg.textContent = 'Please fill all required fields with valid numbers.';
                 return;
             }
 
+            // Build request payload
             const payload = {
                 title: titleEl.value.trim(),
                 description: descEl?.value?.trim() || '',
@@ -248,17 +274,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             try {
+                // Create place and refresh list
                 await createPlace(payload);
                 if (createPlaceMsg) createPlaceMsg.textContent = 'Place created.';
                 createPlaceForm.reset();
                 await fetchPlaces(); // refresh existing listings
             } catch (error) {
+                // Show submit error
                 if (createPlaceMsg) createPlaceMsg.textContent = error.message;
                 console.error(error);
             }
         });
     }
 
+    // Toggle create-place panel open/closed
     if (createPlaceToggleBtn && createPlaceSection) {
         createPlaceToggleBtn.addEventListener("click", () => {
             const open = createPlaceSection.classList.toggle("is-open");
@@ -271,6 +300,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const TOP_THRESHOLD = 8;
     const mainEl = document.querySelector('main');
 
+    // Get scroll position from window or nested scroll containers
     function getScrollTop() {
         const doc = document.documentElement;
         const body = document.body;
@@ -285,12 +315,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
     }
 
+    // Apply header class based on current scroll position
     function syncHeaderState() {
         if (!header) return;
         const y = getScrollTop();
         header.classList.toggle('is-expanded', y <= TOP_THRESHOLD);
     }
 
+    // Set initial header state
     syncHeaderState();
 
     // catch scroll from window OR nested scroll containers

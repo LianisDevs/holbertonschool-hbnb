@@ -42,6 +42,8 @@ Run the application from the holbertonschool-hbnb directory
 ```bash
 python3 run.py
 ```
+Flask will provide the URL to run, such as 127.0.0.1:5000. Make sure to add /app to the end of the url for it to work.
+
 Use tools like Postman or cURL to use the API endpoints, below examples use curl:
 
 ## Admin Features
