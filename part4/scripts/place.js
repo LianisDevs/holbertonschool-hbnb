@@ -37,6 +37,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const addReviewButton = document.getElementById("add-review-button");
   const showReviewFormBtn = document.getElementById("show-review-form-btn");
+  const editPlaceBtn = document.getElementById("edit-place-btn");
+  const editPlaceSection = document.getElementById("edit-place-section");
+  const editPlaceForm = document.getElementById("edit-place-form");
+  const editPlaceMsg = document.getElementById("edit-place-msg");
 
   // Navigate to the add review page, passing the current place ID
   const goToAddReview = () => {
@@ -129,6 +133,82 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Decode JWT payload safely
+  function decodeJwtPayload(token) {
+    try {
+      const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      const json = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+          .join(""),
+      );
+      return JSON.parse(json);
+    } catch {
+      return {};
+    }
+  }
+
+  // Get current user ID from token payload
+  function getCurrentUserId(token) {
+    const payload = decodeJwtPayload(token || "");
+    return (
+      payload.id ||
+      payload.user_id ||
+      (typeof payload.sub === "object" ? payload.sub?.id : payload.sub) ||
+      null
+    );
+  }
+
+  // Delete place by ID
+  async function deletePlace(placeId) {
+    const res = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (!res.ok) {
+      let msg = `Failed to delete listing (${res.status})`;
+      try {
+        const data = await res.json();
+        msg = data.error || data.message || msg;
+      } catch {}
+      throw new Error(msg);
+    }
+  }
+
+  async function updatePlace(placeId, payload) {
+    const res = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      let msg = `Failed to update listing (${res.status})`;
+      try {
+        const data = await res.json();
+        msg = data.error || data.message || msg;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    return res.json();
+  }
+
+  function fillEditForm(place) {
+    document.getElementById("edit-place-title").value = place.title || "";
+    document.getElementById("edit-place-description").value = place.description || "";
+    document.getElementById("edit-place-price").value = place.price || "";
+    document.getElementById("edit-place-latitude").value = place.latitude || "";
+    document.getElementById("edit-place-longitude").value = place.longitude || "";
+  }
+
   async function displayPlaceDetails(place) {
     const placeDetails = document.getElementById("place-details");
 
@@ -206,6 +286,64 @@ document.addEventListener("DOMContentLoaded", async () => {
       // No reviews — clear list and show empty state message
       reviewsList.innerHTML = "";
       noReviews.style.display = "block";
+    }
+
+    // Show delete button only for owner
+    const deleteBtn = document.getElementById("delete-place-btn");
+    const currentUserId = getCurrentUserId(authToken);
+    const ownerId = place.owner?.id || place.owner_id;
+
+    if (
+      deleteBtn &&
+      authToken &&
+      currentUserId &&
+      ownerId &&
+      String(currentUserId) === String(ownerId)
+    ) {
+      if (editPlaceBtn && editPlaceSection) {
+        editPlaceBtn.style.display = "inline-block";
+        editPlaceBtn.onclick = () => {
+          fillEditForm(place);
+          if (editPlaceMsg) editPlaceMsg.textContent = "";
+          editPlaceSection.style.display =
+            editPlaceSection.style.display === "block" ? "none" : "block";
+        };
+      }
+
+      deleteBtn.style.display = "inline-block";
+      deleteBtn.onclick = async () => {
+        const ok = window.confirm("Delete this listing? This cannot be undone.");
+        if (!ok) return;
+
+        try {
+          await deletePlace(place.id);
+          window.location.href = "index.html";
+        } catch (err) {
+          alert(err.message || "Could not delete listing.");
+        }
+      };
+    }
+
+    if (editPlaceForm) {
+      editPlaceForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const payload = {
+          title: document.getElementById("edit-place-title").value.trim(),
+          description: document.getElementById("edit-place-description").value.trim(),
+          price: Number(document.getElementById("edit-place-price").value),
+          latitude: Number(document.getElementById("edit-place-latitude").value),
+          longitude: Number(document.getElementById("edit-place-longitude").value),
+        };
+
+        try {
+          await updatePlace(placeId, payload);
+          if (editPlaceMsg) editPlaceMsg.textContent = "Listing updated successfully.";
+          window.location.reload();
+        } catch (err) {
+          if (editPlaceMsg) editPlaceMsg.textContent = err.message || "Could not update listing.";
+        }
+      });
     }
   }
 

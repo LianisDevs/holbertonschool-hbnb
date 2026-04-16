@@ -190,9 +190,9 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
-        # Get current user from JWT token
-        current_user_id = get_jwt_identity()
-        claims = get_jwt()
+        identity = get_jwt_identity()
+        current_user_id = identity.get("id") if isinstance(identity, dict) else identity
+        claims = get_jwt() or {}
         is_admin = claims.get('is_admin', False)
 
         try:
@@ -200,8 +200,7 @@ class PlaceResource(Resource):
             if not place:
                 return {'error': 'Place not found'}, 404
 
-            # Check if the current user is the owner of the place or and admin
-            if not is_admin and place.owner_id != current_user_id:
+            if not is_admin and str(place.owner_id) != str(current_user_id):
                 return {'error': 'Unauthorized action'}, 403
 
             update_data = api.payload
@@ -242,31 +241,34 @@ class PlaceResource(Resource):
     @jwt_required()
     def delete(self, place_id):
         """Delete a place"""
-        # Get identity
-        current_user_id = get_jwt_identity()
-        claims = get_jwt()
+        identity = get_jwt_identity()
+        current_user_id = identity.get("id") if isinstance(identity, dict) else identity
+        claims = get_jwt() or {}
         is_admin = claims.get('is_admin', False)
 
         try:
-            # 2. Check if place exists
             place = facade.get_place(place_id)
             if not place:
                 return {'error': 'Place not found'}, 404
 
-            # 3. Check permissions: Admin OR Owner
-            if not is_admin and place.owner_id != current_user_id:
+            owner_id = getattr(place, 'owner_id', None) or getattr(place, 'user_id', None)
+            if not is_admin and str(owner_id) != str(current_user_id):
                 return {'error': 'Unauthorized action'}, 403
 
-            # 4. Execute deletion using your facade method
-            success = facade.delete_place(place_id)
+            # Delete child reviews first (prevents FK constraint failures)
+            reviews = facade.get_reviews_by_place(place_id) or []
+            for review in reviews:
+                facade.delete_review(review.id)
 
-            if success:
-                return {'message': 'Place deleted successfully'}, 200
-            else:
+            success = facade.delete_place(place_id)
+            if success is False:
                 return {'error': 'Failed to delete place'}, 400
 
-        except Exception:
-            return {'error': 'Internal server error'}, 500
+            return {'message': 'Place deleted successfully'}, 200
+
+        except Exception as e:
+            current_app.logger.exception("Failed to delete place %s", place_id)
+            return {'error': f'Internal server error: {str(e)}'}, 500
 
 
 @api.route('/<place_id>/reviews')
